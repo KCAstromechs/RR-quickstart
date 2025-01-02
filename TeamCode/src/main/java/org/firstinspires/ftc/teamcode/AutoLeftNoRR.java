@@ -4,8 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 
-import javax.management.DynamicMBean;
-import javax.naming.directory.DirContext;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -47,7 +45,10 @@ public class AutoLeftNoRR extends LinearOpMode {
     private Servo wrist;
 
     // Sped
-    private double speed = -0.4;
+    double speed = -0.4;
+
+    // Yaw (for rotate)
+    double yawAngle;
 
     /**
      * This function is executed when this OpMode is selected from the Driver Station.
@@ -130,6 +131,8 @@ public class AutoLeftNoRR extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             // Put run blocks here.
+            WRIST_TO_SUB();
+            OPEN_GRABBER();
             sleep(200);
             MOVE_FORWARD(590);
             sleep(100);
@@ -139,19 +142,39 @@ public class AutoLeftNoRR extends LinearOpMode {
             RAISE_LIFT();
 //            sleep(10);
             FLIP_BUCKET();
-//            sleep(2000);
-            sleep(50);
+            sleep(1500);
             RESET_BUCKET();
             sleep(100);
             LOWER_LIFT();
 //            CLOSE_GRABBER();
             sleep(10);
             // At this point, we have set the pre-loaded sample into the high basket.
+            WRIST_TO_GROUND();
+            MOVE_BACKWARD(200);
             STRAFE_RIGHT(400);
             TURN_LEFT(90);
-
-
-
+            LOWER_ARM();
+            sleep(500);
+            MOVE_BACKWARD(300); // TO GRAB SAMPLE ON GROUND
+            CLOSE_GRABBER();
+            sleep(300);
+            RAISE_ARM();
+            WRIST_TO_BUCKET();
+            sleep(500);
+            OPEN_GRABBER();
+            sleep(100);
+            WRIST_TO_SUB();
+            MOVE_FORWARD(300);
+            TURN_RIGHT(90);
+            STRAFE_LEFT(300); // Strafe to line up with wall
+            MOVE_FORWARD(250); // Move forward to reach the high basket
+            RAISE_LIFT(); // Raise 2nd sample
+            FLIP_BUCKET(); // slam dunk
+            sleep(1250);
+            RESET_BUCKET(); // move bucket away
+            sleep(100);
+            //LOWER_LIFT(); // bring the lift back down
+            // At this point, approximately 30 seconds have passed
         }
     }
     /**
@@ -162,6 +185,7 @@ public class AutoLeftNoRR extends LinearOpMode {
         rightFront.setPower(0);
         rightBack.setPower(0);
         leftBack.setPower(0);
+        sleep(200);
     }
 
     /**
@@ -268,7 +292,7 @@ public class AutoLeftNoRR extends LinearOpMode {
      * @param degrees distance to turn in degrees
      */
     private void TURN_LEFT(int degrees) {
-        imu.resetYaw()
+        imu.resetYaw();
         yawAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -293,7 +317,7 @@ public class AutoLeftNoRR extends LinearOpMode {
         grabber.setPosition(0.65);
         telemetry.addData("Grabber status", "open");
         telemetry.update();
-        sleep(1000);
+        sleep(100);
     }
 
 
@@ -304,7 +328,17 @@ public class AutoLeftNoRR extends LinearOpMode {
         grabber.setPosition(0.9);
         telemetry.addData("Grabber status", "closed");
         telemetry.update();
-        sleep(1000);
+        sleep(100);
+    }
+
+    private void WRIST_TO_GROUND() {
+        wrist.setPosition(.75);
+    }
+    private void WRIST_TO_SUB() {
+        wrist.setPosition(.9);
+    }
+    private void WRIST_TO_BUCKET() {
+        wrist.setPosition(.6);
     }
 
 
@@ -312,27 +346,26 @@ public class AutoLeftNoRR extends LinearOpMode {
      * Moves lift to 'low' position
      */
     private void LOWER_LIFT() {
-        sleep(200);
-        if (lift.getCurrentPosition() > 100) {
-            while (lift.getCurrentPosition() > 100) {
+        if (lift.getCurrentPosition() > 50) {
+            while (lift.getCurrentPosition() > 50) {
                 lift.setPower(-0.3);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
-        } else if (lift.getCurrentPosition() < 100) {
-            while (lift.getCurrentPosition() < 100) {
+        } else if (lift.getCurrentPosition() < 50) {
+            while (lift.getCurrentPosition() < 50) {
                 lift.setPower(0.3);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
         }
+        sleep(200);
     }
 
     /**
      * Moves lift to 'highest' position
      */
     private void RAISE_LIFT() {
-        sleep(200);
         if (lift.getCurrentPosition() > 4000) {
             while (lift.getCurrentPosition() > 4000) {
                 lift.setPower(-0.5);
@@ -346,6 +379,7 @@ public class AutoLeftNoRR extends LinearOpMode {
             }
             lift.setPower(0);
         }
+        sleep(200);
     }
 
     /**
@@ -353,7 +387,6 @@ public class AutoLeftNoRR extends LinearOpMode {
      * @param custom_pos the position the lift will raise to (in encoder clicks)
      */
     private void RAISE_LIFT_CUSTOM(int custom_pos) {
-        sleep(200);
         if (lift.getCurrentPosition() > custom_pos) {
             while (lift.getCurrentPosition() > custom_pos) {
                 lift.setPower(-0.5);
@@ -367,6 +400,7 @@ public class AutoLeftNoRR extends LinearOpMode {
             }
             lift.setPower(0);
         }
+        sleep(200);
     }
 
     /**
@@ -394,49 +428,53 @@ public class AutoLeftNoRR extends LinearOpMode {
         bucket.setPosition(0);
         telemetry.addData("Bucket Status: ", "flipped");
         telemetry.update();
-        sleep(1000);
+        sleep(200);
     }
 
     private void RESET_BUCKET() {
         bucket.setPosition(0.7);
         telemetry.addData("Bucket Status: ", "normal");
         telemetry.update();
-        sleep(1000);
+        sleep(200);
     }
 
 
 // TODO TEST THESE NUMBERS
+    // NEGATIVE POWER IS UP FOR FRONT ARM
+    // POSITIVE POWER IS DOWN FOR FRONT ARM
+    // ~400 encoder clicks is arm down
+    // ~0 encoder clicks is arm up (I use 50 instead of 0 so we don't bonk ourself
     private void RAISE_ARM() {
-        sleep(200);
-        if (frontArm.getCurrentPosition() > 4000) {
-            while (frontArm.getCurrentPosition() > 4000) {
+        if (frontArm.getCurrentPosition() > 50) {
+            while (frontArm.getCurrentPosition() > 50) {
                 frontArm.setPower(-0.5);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
-        } else if (frontArm.getCurrentPosition() < 4000) {
-            while (frontArm.getCurrentPosition() < 4000) {
+        } else if (frontArm.getCurrentPosition() < 50) {
+            while (frontArm.getCurrentPosition() < 50) {
                 frontArm.setPower(0.5);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
         }
+        sleep(200);
     }
 
     private void LOWER_ARM() {
-        sleep(200);
-        if (frontArm.getCurrentPosition() > 4000) {
-            while (frontArm.getCurrentPosition() > 4000) {
+        if (frontArm.getCurrentPosition() > 250) {
+            while (frontArm.getCurrentPosition() > 250) {
                 frontArm.setPower(-0.5);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
-        } else if (frontArm.getCurrentPosition() < 4000) {
-            while (frontArm.getCurrentPosition() < 4000) {
+        } else if (frontArm.getCurrentPosition() < 250) {
+            while (frontArm.getCurrentPosition() < 250) {
                 frontArm.setPower(0.5);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
         }
+        sleep(200);
     }
 }

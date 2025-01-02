@@ -170,6 +170,10 @@ public class TELELEOPTETESTING extends LinearOpMode {
                 // Bucket telemetry
                 telemetry.addData("Position of bucket", bucket.getPosition());
 
+                // Front Arm telemetry
+                telemetry.addData("Power of frontArm", frontArm.getPower());
+                telemetry.addData("Position of frontArm", frontArm.getCurrentPosition());
+
                 // ------------------------------ACTUAL MOVEMENT STUFF------------------------------
 
                 // BOOSTER BUTTON!!!!!
