@@ -45,7 +45,7 @@ public class AutoLeftNoRR extends LinearOpMode {
     private Servo wrist;
 
     // Sped
-    double speed = -0.4;
+    double speed = -0.5; // this is negative bc bucket is front now
 
     // Yaw (for rotate)
     double yawAngle;
@@ -132,6 +132,7 @@ public class AutoLeftNoRR extends LinearOpMode {
         if (opModeIsActive()) {
             // Put run blocks here.
             WRIST_TO_SUB();
+            RESET_BUCKET();
             OPEN_GRABBER();
             sleep(200);
             MOVE_FORWARD(590);
@@ -142,7 +143,7 @@ public class AutoLeftNoRR extends LinearOpMode {
             RAISE_LIFT();
 //            sleep(10);
             FLIP_BUCKET();
-            sleep(1500);
+            sleep(1000);
             RESET_BUCKET();
             sleep(100);
             LOWER_LIFT();
@@ -153,30 +154,60 @@ public class AutoLeftNoRR extends LinearOpMode {
             MOVE_BACKWARD(200);
             STRAFE_RIGHT(400);
             TURN_LEFT(90);
-            LOWER_ARM();
-            sleep(500);
-            MOVE_BACKWARD(300); // TO GRAB SAMPLE ON GROUND
-            CLOSE_GRABBER();
-            sleep(300);
-            RAISE_ARM();
-            WRIST_TO_BUCKET();
-            sleep(500);
-            OPEN_GRABBER();
-            sleep(100);
-            WRIST_TO_SUB();
-            MOVE_FORWARD(300);
-            TURN_RIGHT(90);
-            STRAFE_LEFT(300); // Strafe to line up with wall
-            MOVE_FORWARD(250); // Move forward to reach the high basket
+            GRAB_SAMPLE(100);
+            TURN_RIGHT(60); // need to fine tune this angle
+            MOVE_FORWARD(450); // need to tune this distance
             RAISE_LIFT(); // Raise 2nd sample
             FLIP_BUCKET(); // slam dunk
-            sleep(1250);
+            sleep(1000);
             RESET_BUCKET(); // move bucket away
             sleep(100);
-            //LOWER_LIFT(); // bring the lift back down
-            // At this point, approximately 30 seconds have passed
+            LOWER_LIFT(); // bring the lift back down
+            TURN_LEFT(56);
+            WRIST_TO_GROUND();
+            GRAB_SAMPLE(250);
+            MOVE_FORWARD(250);
+            TURN_RIGHT(56);
+            RAISE_LIFT(); // Raise 3rd sample
+            FLIP_BUCKET(); // slam dunk
+            sleep(1000);
+//            RESET_BUCKET(); // move bucket away
+//            sleep(100);
+//            LOWER_LIFT(); // bring the lift back down
+
+
+
+//            MOVE_FORWARD(300);
+//            TURN_RIGHT(90);
+//            STRAFE_LEFT(300); // Strafe to line up with wall
+//            MOVE_FORWARD(250); // Move forward to reach the high basket
+//            RAISE_LIFT(); // Raise 2nd sample
+//            FLIP_BUCKET(); // slam dunk
+//            sleep(1000);
+//            RESET_BUCKET(); // move bucket away
+//            sleep(100);
+//            //LOWER_LIFT(); // bring the lift back down
+//            // At this point, approximately 30 seconds have passed
         }
     }
+
+
+    /**
+     * Grabs a sample
+     */
+    private void GRAB_SAMPLE(int dist_away_from_sample) {
+        LOWER_ARM();
+        MOVE_BACKWARD(dist_away_from_sample); // TO GRAB SAMPLE ON GROUND
+        CLOSE_GRABBER();
+        sleep(200);
+        RAISE_ARM();
+        WRIST_TO_BUCKET();
+        sleep(400);
+        OPEN_GRABBER();
+        sleep(100);
+        WRIST_TO_SUB();
+    }
+
     /**
      * STOP the robot
      */
@@ -338,7 +369,7 @@ public class AutoLeftNoRR extends LinearOpMode {
         wrist.setPosition(.9);
     }
     private void WRIST_TO_BUCKET() {
-        wrist.setPosition(.6);
+        wrist.setPosition(.55);
     }
 
 
@@ -348,13 +379,13 @@ public class AutoLeftNoRR extends LinearOpMode {
     private void LOWER_LIFT() {
         if (lift.getCurrentPosition() > 50) {
             while (lift.getCurrentPosition() > 50) {
-                lift.setPower(-0.3);
+                lift.setPower(-0.5);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
         } else if (lift.getCurrentPosition() < 50) {
             while (lift.getCurrentPosition() < 50) {
-                lift.setPower(0.3);
+                lift.setPower(0.5);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
@@ -368,13 +399,13 @@ public class AutoLeftNoRR extends LinearOpMode {
     private void RAISE_LIFT() {
         if (lift.getCurrentPosition() > 4000) {
             while (lift.getCurrentPosition() > 4000) {
-                lift.setPower(-0.5);
+                lift.setPower(-1);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
         } else if (lift.getCurrentPosition() < 4000) {
             while (lift.getCurrentPosition() < 4000) {
-                lift.setPower(0.5);
+                lift.setPower(1);
                 LIFT_UPDATE(lift.getCurrentPosition());
             }
             lift.setPower(0);
@@ -447,13 +478,13 @@ public class AutoLeftNoRR extends LinearOpMode {
     private void RAISE_ARM() {
         if (frontArm.getCurrentPosition() > 50) {
             while (frontArm.getCurrentPosition() > 50) {
-                frontArm.setPower(-0.5);
+                frontArm.setPower(-0.6);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
         } else if (frontArm.getCurrentPosition() < 50) {
             while (frontArm.getCurrentPosition() < 50) {
-                frontArm.setPower(0.5);
+                frontArm.setPower(0.6);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
@@ -462,19 +493,19 @@ public class AutoLeftNoRR extends LinearOpMode {
     }
 
     private void LOWER_ARM() {
-        if (frontArm.getCurrentPosition() > 250) {
-            while (frontArm.getCurrentPosition() > 250) {
-                frontArm.setPower(-0.5);
+        if (frontArm.getCurrentPosition() > 275) {
+            while (frontArm.getCurrentPosition() > 275) {
+                frontArm.setPower(-0.6);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
         } else if (frontArm.getCurrentPosition() < 250) {
             while (frontArm.getCurrentPosition() < 250) {
-                frontArm.setPower(0.5);
+                frontArm.setPower(0.6);
                 FRONT_ARM_UPDATE(frontArm.getCurrentPosition());
             }
             frontArm.setPower(0);
         }
-        sleep(200);
+        sleep(500);
     }
 }
