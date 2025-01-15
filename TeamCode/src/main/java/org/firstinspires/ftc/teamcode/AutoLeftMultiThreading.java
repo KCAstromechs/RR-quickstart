@@ -18,8 +18,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name = "AutoLeftNoRR (Java)", preselectTeleOp = "TELELEOPTETESTING (Java)")
-public class AutoLeftNoRR extends LinearOpMode {
+@Autonomous(name = "AutoLeftMultiThreading (Java)") // preselectTeleOp = "TELELEOPTETESTING (Java)"
+public class AutoLeftMultiThreading extends LinearOpMode {
 
     // Drive Motors
     private DcMotor leftBack;
@@ -135,12 +135,12 @@ public class AutoLeftNoRR extends LinearOpMode {
             RESET_BUCKET();
             OPEN_GRABBER();
             sleep(200);
+            RAISE_LIFT_THREAD().start();
             MOVE_FORWARD(590);
             sleep(100);
             STRAFE_RIGHT(100);
             sleep(50);
 //            OPEN_GRABBER();
-            RAISE_LIFT();
 //            sleep(10);
             FLIP_BUCKET();
             sleep(800);
@@ -156,8 +156,8 @@ public class AutoLeftNoRR extends LinearOpMode {
             TURN_LEFT(88);
             GRAB_SAMPLE(100);
             TURN_RIGHT(60); // need to fine tune this angle
+            RAISE_LIFT_THREAD().start(); // Raise 2nd sample
             MOVE_FORWARD(450); // need to tune this distance
-            RAISE_LIFT(); // Raise 2nd sample
             FLIP_BUCKET(); // slam dunk
             sleep(800);
             RESET_BUCKET(); // move bucket away
@@ -171,23 +171,8 @@ public class AutoLeftNoRR extends LinearOpMode {
             RAISE_LIFT(); // Raise 3rd sample
             FLIP_BUCKET(); // slam dunk
             sleep(800);
-//            RESET_BUCKET(); // move bucket away
-//            sleep(100);
-//            LOWER_LIFT(); // bring the lift back down
 
 
-
-//            MOVE_FORWARD(300);
-//            TURN_RIGHT(90);
-//            STRAFE_LEFT(300); // Strafe to line up with wall
-//            MOVE_FORWARD(250); // Move forward to reach the high basket
-//            RAISE_LIFT(); // Raise 2nd sample
-//            FLIP_BUCKET(); // slam dunk
-//            sleep(1000);
-//            RESET_BUCKET(); // move bucket away
-//            sleep(100);
-//            //LOWER_LIFT(); // bring the lift back down
-//            // At this point, approximately 30 seconds have passed
         }
     }
 
@@ -207,6 +192,7 @@ public class AutoLeftNoRR extends LinearOpMode {
         sleep(100);
         WRIST_TO_SUB();
     }
+
 
     /**
      * STOP the robot
@@ -413,6 +399,38 @@ public class AutoLeftNoRR extends LinearOpMode {
         sleep(200);
     }
 
+    public class RaiseLiftMulti extends Thread {
+
+        @Override
+        public void run() {
+            if (lift.getCurrentPosition() > 4000) {
+                while (lift.getCurrentPosition() > 4000) {
+                    lift.setPower(-1);
+                    LIFT_UPDATE(lift.getCurrentPosition());
+                }
+                lift.setPower(0);
+            } else if (lift.getCurrentPosition() < 4000) {
+                while (lift.getCurrentPosition() < 4000) {
+                    lift.setPower(1);
+                    LIFT_UPDATE(lift.getCurrentPosition());
+                }
+                lift.setPower(0);
+            }
+            try {
+                sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public RaiseLiftMulti RAISE_LIFT_THREAD() {
+        RaiseLiftMulti thread = new RaiseLiftMulti();
+
+        return thread;
+    }
+
+
     /**
      * Raises lift to a custom pos
      * @param custom_pos the position the lift will raise to (in encoder clicks)
@@ -470,7 +488,7 @@ public class AutoLeftNoRR extends LinearOpMode {
     }
 
 
-// TODO TEST THESE NUMBERS
+    // TODO TEST THESE NUMBERS
     // NEGATIVE POWER IS UP FOR FRONT ARM
     // POSITIVE POWER IS DOWN FOR FRONT ARM
     // ~400 encoder clicks is arm down
