@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,8 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name = "AutoLeftMultiThreading (Java)", preselectTeleOp = "TELELEOPTETESTING (Java)") // preselectTeleOp = "TELELEOPTETESTING (Java)"
-public class AutoLeftMultiThreading extends LinearOpMode {
+@Autonomous(name = "AutoRightMultiThreading (Java)", preselectTeleOp = "TELELEOPTETESTING (Java)")
+public class AutoRightMultiThreading extends LinearOpMode {
 
     // Drive Motors
     private DcMotor leftBack;
@@ -45,10 +44,9 @@ public class AutoLeftMultiThreading extends LinearOpMode {
     private Servo wrist;
 
     // Sped
-    double speed = -0.5; // this is negative bc bucket is front now
+    private double speed = -0.4;
 
-    // Yaw (for rotate)
-    double yawAngle;
+    private double yawAngle;
 
     /**
      * This function is executed when this OpMode is selected from the Driver Station.
@@ -59,10 +57,6 @@ public class AutoLeftMultiThreading extends LinearOpMode {
         // IMU stuff
         YawPitchRollAngles orientation;
         AngularVelocity angularVelocity;
-
-        // CONSTANTS
-        double yawAngle;
-        double Speed_percentage;
 
         // Drive Motors
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
@@ -116,8 +110,7 @@ public class AutoLeftMultiThreading extends LinearOpMode {
         // Wrist stuff
         double wrist_pos = -1;
 
-        Speed_percentage = 0.6;
-        yawAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double Speed_percentage = 0.6;
         // Initialize the IMU.
         // Initialize the IMU with non-default settings. To use this block,
         // plug one of the "new IMU.Parameters" blocks into the parameters socket.
@@ -130,53 +123,20 @@ public class AutoLeftMultiThreading extends LinearOpMode {
         telemetry.update();
         waitForStart();
         if (opModeIsActive()) {
-            // Put run blocks here.
-            WRIST_TO_SUB();
-            RESET_BUCKET();
-            OPEN_GRABBER();
-            sleep(200);
-            RAISE_LIFT_THREAD().start();
-            MOVE_FORWARD(590);
-            sleep(100);
-            STRAFE_RIGHT(100);
-            sleep(50);
-//            OPEN_GRABBER();
-//            sleep(10);
-            FLIP_BUCKET();
-            sleep(800);
-            RESET_BUCKET();
-            sleep(100);
-            LOWER_LIFT();
-//            CLOSE_GRABBER();
-            sleep(10);
-            // At this point, we have set the pre-loaded sample into the high basket.
-            WRIST_TO_GROUND();
-            MOVE_BACKWARD(200);
-            STRAFE_RIGHT(400);
-            TURN_LEFT(89);
-            GRAB_SAMPLE(100);
-            TURN_RIGHT(60); // need to fine tune this angle
-            RAISE_LIFT_THREAD().start(); // Raise 2nd sample
-            MOVE_FORWARD(350); // need to tune this distance
-            FLIP_BUCKET(); // slam dunk
-            sleep(800);
-            RESET_BUCKET(); // move bucket away
-            sleep(100);
-            LOWER_LIFT(); // bring the lift back down
-            TURN_LEFT(54);
-            WRIST_TO_GROUND();
-            GRAB_SAMPLE(175);
-            MOVE_FORWARD(230);
-            TURN_RIGHT(56);
-            RAISE_LIFT(); // Raise 3rd sample
-            FLIP_BUCKET(); // slam dunk
-            sleep(800);
+            // Put run blocks here. ----------------------------------------------------------------
+            STRAFE_LEFT(100); // Strafe away from wall
+            MOVE_FORWARD(800); // Move forward into next square (part of robot should be in obs. zone)
+            STRAFE_LEFT(2500); // Strafe toward/past colored samples
+            MOVE_FORWARD(400); // Move forward to align side with first colored sample
+            STRAFE_RIGHT(3000); // Strafe back to obs. zone (should bring first colored sample into obs. zone)
+            STRAFE_LEFT(3000); // Strafe toward/past colored samples
+            MOVE_FORWARD(400); // Move forward to align side with second colored sample
+            STRAFE_RIGHT(3000); // Strafe back to obs. zone (should bring second colored sample into obs. zone)
+            STRAFE_LEFT(50); // Strafe off of colored sample (only to stop contacting the piece)
 
 
         }
     }
-
-
     /**
      * Grabs a sample
      */
@@ -423,12 +383,12 @@ public class AutoLeftMultiThreading extends LinearOpMode {
             }
         }
     }
-
-    public RaiseLiftMulti RAISE_LIFT_THREAD() {
-        RaiseLiftMulti thread = new RaiseLiftMulti();
-
-        return thread;
-    }
+//
+//    public AutoLeftMultiThreading.RaiseLiftMulti RAISE_LIFT_THREAD() {
+//        AutoLeftMultiThreading.RaiseLiftMulti thread = new AutoRightMultiThreading.RaiseLiftMulti();
+//
+//        return thread;
+//    }
 
 
     /**

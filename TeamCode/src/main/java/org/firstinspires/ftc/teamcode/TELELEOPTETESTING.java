@@ -109,6 +109,8 @@ public class TELELEOPTETESTING extends LinearOpMode {
         // Wrist stuff
         double wrist_pos = -1;
 
+        boolean auto_wrist_rotate = true;
+
         Speed_percentage = 0.6;
         yawAngle = 0;
         // Initialize the IMU.
@@ -196,13 +198,21 @@ public class TELELEOPTETESTING extends LinearOpMode {
                 // WRIST
                 if (gamepad2.a) {
                     wrist_pos = .9; // sub - A
+                    auto_wrist_rotate = false;
                 } else if (gamepad2.b) {
                     wrist_pos = .75; // ground - B
                 } else if (gamepad2.x) {
                     wrist_pos = .6; // bucket - X
+                    auto_wrist_rotate = true;
+                } else if (gamepad2.left_stick_y < 0 && auto_wrist_rotate) { // this is some stuff for ricky
+                    // if left stick / frontArm goes up, then flip wrist to bucket
+                    wrist_pos = .6; // bucket
+                } else if (gamepad2.left_stick_y > 0 && auto_wrist_rotate) {
+                    // if left stick / frontArm goes down, then flip wrist to ground
+                    wrist_pos = .75;
                 }
 
-                // normalization
+                // normalization (actually no this is
                 if (wrist_pos != -1) {
                     if (gamepad2.dpad_down) {
                         wrist_pos += .1;
@@ -225,7 +235,7 @@ public class TELELEOPTETESTING extends LinearOpMode {
                 } else if (gamepad2.dpad_left) {
                     bucket.setPosition(0.6); // old norm
                 } else {
-                    bucket.setPosition(0.7);// test/new norm
+                    bucket.setPosition(0.67);// test/new norm
                 }
 
                 // LIFT CRAP
@@ -235,6 +245,7 @@ public class TELELEOPTETESTING extends LinearOpMode {
                 // FRONT ARM CRAP
                 frontArm.setPower(gamepad2.left_stick_y * .5); // speed limit used to be .7
 
+                // negative front arm power is up
 
                 // FIELD CENTRIC CRAP
 
