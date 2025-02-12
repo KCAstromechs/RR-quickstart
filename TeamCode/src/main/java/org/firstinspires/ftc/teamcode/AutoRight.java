@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import java.util.Vector;
 
 @Config
-@Disabled
+//@Disabled
 @Autonomous(name = "AutoRight", preselectTeleOp = "TELELEOPTETESTING (Java)")
 public class AutoRight extends LinearOpMode {
 
@@ -48,7 +48,7 @@ public class AutoRight extends LinearOpMode {
         double initialX = -13;
         double initialY = 63.5;
         double initialHeading = Math.toRadians(180);
-        String auto_type = "park"; // change "park" to "get samples" depending on auto goal, vice versa
+        String auto_type = "get samples"; // change "park" to "get samples" depending on auto goal, vice versa
 
         Pose2d initialPose = new Pose2d(initialX, initialY, initialHeading);
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);

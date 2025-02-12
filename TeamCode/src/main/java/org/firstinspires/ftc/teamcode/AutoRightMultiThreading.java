@@ -89,6 +89,9 @@ public class AutoRightMultiThreading extends LinearOpMode {
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 //        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -129,10 +132,10 @@ public class AutoRightMultiThreading extends LinearOpMode {
             STRAFE_LEFT(2500); // Strafe toward/past colored samples
             MOVE_FORWARD(400); // Move forward to align side with first colored sample
             STRAFE_RIGHT(3000); // Strafe back to obs. zone (should bring first colored sample into obs. zone)
-            STRAFE_LEFT(3000); // Strafe toward/past colored samples
-            MOVE_FORWARD(400); // Move forward to align side with second colored sample
-            STRAFE_RIGHT(3000); // Strafe back to obs. zone (should bring second colored sample into obs. zone)
-            STRAFE_LEFT(50); // Strafe off of colored sample (only to stop contacting the piece)
+            STRAFE_LEFT(2600); // Strafe toward/past colored samples
+            MOVE_FORWARD(600); // Move forward to align side with second colored sample
+            STRAFE_RIGHT(2600); // Strafe back to obs. zone (should bring second colored sample into obs. zone)
+            STRAFE_LEFT(200); // Strafe off of colored sample (only to stop contacting the piece)
 
 
         }

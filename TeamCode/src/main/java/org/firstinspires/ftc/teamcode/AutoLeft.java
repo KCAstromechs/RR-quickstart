@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Trajectory;
@@ -26,7 +27,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Config
-@Disabled
+//@Disabled
 @Autonomous(name = "AutoLeft", group = "Autonomous")
 public class AutoLeft extends LinearOpMode {
 
@@ -45,7 +46,7 @@ public class AutoLeft extends LinearOpMode {
         // instantiate your MecanumDrive at a particular pose.
         double initialX = 36;
         double initialY = 63.5;
-        double initialHeading = Math.toRadians(90);
+        double initialHeading = Math.toRadians(0);
         String auto_type = "get samples"; // change "park" to "get samples" depending on auto goal, vice versa
 
         Pose2d initialPose = new Pose2d(initialX, initialY, initialHeading);
@@ -180,19 +181,17 @@ public class AutoLeft extends LinearOpMode {
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                // Whatever the heck we want to happen goes directly below
-                .strafeTo(new Vector2d(60, 36))
-                .strafeTo(new Vector2d(60, 50)) // might not need this
+                // Whatever the heck we want to happe n goes directly below
+                .strafeTo(new Vector2d(53, 61.5));
+                /*.strafeTo(new Vector2d(60, 50)) // might not need this
                 .strafeTo(new Vector2d(60, 36)) // might not need this
                 // THIS IS WHERE WE WILL PICK UP STUFF
                 .turnTo(Math.toRadians(180))
                 .strafeTo(new Vector2d(36, 5))
                 .strafeTo(new Vector2d(26, 5))
-                .waitSeconds(2);
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(36, 11))
-                .turnTo(Math.toRadians(180))
-                .strafeTo(new Vector2d(24, 11));
+                .waitSeconds(2);*/
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(54, 61.5, initialHeading))
+                .turnTo(Math.toRadians(45));
         TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(20, 11));
 
@@ -230,11 +229,12 @@ public class AutoLeft extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        trajectoryActionChosen,
+                        trajectoryActionChosen
+
 //                        grabber.close_grabber(),
 //                        grabber.open_grabber(),
 //                        lift.raise_lift(),
-                        tab3.build()   //,
+//                        tab3.build()   //,
 //                        trajectoryActionCloseOut
                 )
         );
