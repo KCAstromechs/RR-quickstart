@@ -26,25 +26,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+
 @Config
 //@Disabled
 @Autonomous(name = "AutoLeft", group = "Autonomous")
 public class AutoLeft extends LinearOpMode {
 
-//    public class Lift {
-//        private DcMotorEx lift;
-//
-//        public Lift(HardwareMap hardwareMap) {
-//            lift = hardwareMap.get(DcMotorEx.class, "liftMotor");
-//            lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            lift.setDirection(DcMotorSimple.Direction.FORWARD);
-//        }
-//    }
 
     @Override
     public void runOpMode() { //throws InterruptedException
         // instantiate your MecanumDrive at a particular pose.
-        double initialX = 36;
+        double initialX = 39;
         double initialY = 63.5;
         double initialHeading = Math.toRadians(0);
         String auto_type = "get samples"; // change "park" to "get samples" depending on auto goal, vice versa
@@ -53,136 +45,25 @@ public class AutoLeft extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
-        // make a Grabber instance
-//        class Grabber {
-//            private Servo servo;
-//
-//            public Grabber(HardwareMap hardwareMap) {
-//                servo = hardwareMap.get(Servo.class, "grabber");
-//            }
-//
-//            public Action close_grabber() {
-//                return new Action() {
-//                    private boolean initialized = false;
-//
-//                    @Override
-//                    public boolean run(@NonNull TelemetryPacket packet) {
-//                        if (!initialized) {
-//                            // RUN CODE HERE
-//                            servo.setPosition(.1);
-//                            initialized = true;
-//                        }
-//
-//                        double pos = servo.getPosition();
-//                        packet.put("Grabber Pos", pos);
-//                        return pos < 10_000.0;
-//                    }
-//                };
-//            }
-//
-//            public Action open_grabber() {
-//                return new Action() {
-//                    private  boolean initialized = false;
-//
-//                    @Override
-//                    public boolean run(@NonNull TelemetryPacket packet) {
-//                        if (!initialized) {
-//                            // RUN CODE HERE
-//                            servo.setPosition(0);
-//                            initialized = true;
-//                        }
-//
-//                        double pos = servo.getPosition();
-//                        packet.put("Grabber Pos", pos);
-//                        return pos < 10_000.0;
-//                    }
-//                };
-//            }
-//        }
-
-////        // make a Lift instance
-////        class Lift {
-////            private DcMotor lift;
-////
-////            public Lift(HardwareMap hardwareMap) {
-////                // Init the lift
-////                lift = hardwareMap.get(DcMotor.class, "lift1");
-////                lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-////                lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-////                lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-////
-////            }
-////
-////            public Action lower_lift() {
-////                return new Action() {
-////                    private boolean initialized = false;
-////
-////                    @Override
-////                    public boolean run(@NonNull TelemetryPacket packet) {
-////                        if (!initialized) {
-////                            // RUN CODE HERE
-////                            // TODO change 0 to 'low' lift position
-////                            if (lift.getCurrentPosition() > 0) {
-////                                while (lift.getCurrentPosition() > 0) {
-////                                    lift.setPower(-0.5);
-////                                }
-////                                lift.setPower(0);
-////                            } else if (lift.getCurrentPosition() < 0) {
-////                                while (lift.getCurrentPosition() < 0) {
-////                                    lift.setPower(0.5);
-////                                }
-////                                lift.setPower(0);
-////                            }
-////                            initialized = true;
-////                        }
-////
-////                        double pos = lift.getCurrentPosition();
-////                        packet.put("Lift Pos", pos);
-////                        return pos < 10_000.0;
-////                    }
-////                };
-////            }
-//
-//            public Action raise_lift() {
-//                return new Action() {
-//                    private boolean initialized = false;
-//
-//                    @Override
-//                    public boolean run(@NonNull TelemetryPacket packet) {
-//                        if (!initialized) {
-//                            // RUN CODE HERE
-//                            // TODO change 0 to 'raised' lift position
-//                            if (lift.getCurrentPosition() > 1350) {
-//                                while (lift.getCurrentPosition() > 1350) {
-//                                    lift.setPower(-0.5);
-//                                }
-//                                lift.setPower(0);
-//                            } else if (lift.getCurrentPosition() < 1350) {
-//                                while (lift.getCurrentPosition() < 1350) {
-//                                    lift.setPower(0.5);
-//                                }
-//                                lift.setPower(0);
-//                            }
-//                            initialized = true;
-//                        }
-//
-//                        double pos = lift.getCurrentPosition();
-//                        packet.put("Lift Pos", pos);
-//                        return pos < 10_000.0;
-//                    }
-//                };
-//            }
-//        }
         // CREATE RR ATTACHMENT OBJECTS
-//        Lift lift = new Lift(hardwareMap);
-//        Grabber grabber = new Grabber(hardwareMap);
+        Lift lift = new Lift(hardwareMap);
+        Grabber grabber = new Grabber(hardwareMap);
+        Bucket bucket = new Bucket(hardwareMap);
+
 
         // vision here that outputs position
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                // Whatever the heck we want to happe n goes directly below
-                .strafeTo(new Vector2d(53, 61.5));
+                // Whatever the heck we want to happen goes directly below
+                .strafeTo(new Vector2d(53, 61))
+                .turnTo(Math.toRadians(45))
+                // split here and place sample in high basket
+                .strafeTo(new Vector2d(52, 52))
+                .turnTo(Math.toRadians(90))
+                .strafeTo(new Vector2d(53, 61))
+                .turnTo(Math.toRadians(45));
+
                 /*.strafeTo(new Vector2d(60, 50)) // might not need this
                 .strafeTo(new Vector2d(60, 36)) // might not need this
                 // THIS IS WHERE WE WILL PICK UP STUFF
