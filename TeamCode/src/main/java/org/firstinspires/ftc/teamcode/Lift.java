@@ -28,13 +28,14 @@ public class Lift {
                 if (!initialized) {
                     // RUN CODE HERE
                     // TODO change 0 to 'low' lift position
-                    if (lift.getCurrentPosition() > 0) {
-                        while (lift.getCurrentPosition() > 0) {
+                    // TO DO is done
+                    if (lift.getCurrentPosition() > 50) {
+                        while (lift.getCurrentPosition() > 50) {
                             lift.setPower(-0.5);
                         }
                         lift.setPower(0);
-                    } else if (lift.getCurrentPosition() < 0) {
-                        while (lift.getCurrentPosition() < 0) {
+                    } else if (lift.getCurrentPosition() < 50) {
+                        while (lift.getCurrentPosition() < 50) {
                             lift.setPower(0.5);
                         }
                         lift.setPower(0);
@@ -58,14 +59,15 @@ public class Lift {
                 if (!initialized) {
                     // RUN CODE HERE
                     // TODO change 0 to 'raised' lift position
-                    if (lift.getCurrentPosition() > 1350) {
-                        while (lift.getCurrentPosition() > 1350) {
-                            lift.setPower(-0.5);
+                    // TO DO is done
+                    if (lift.getCurrentPosition() > 4000) {
+                        while (lift.getCurrentPosition() > 4000) {
+                            lift.setPower(-1);
                         }
                         lift.setPower(0);
-                    } else if (lift.getCurrentPosition() < 1350) {
-                        while (lift.getCurrentPosition() < 1350) {
-                            lift.setPower(0.5);
+                    } else if (lift.getCurrentPosition() < 4000) {
+                        while (lift.getCurrentPosition() < 4000) {
+                            lift.setPower(1);
                         }
                         lift.setPower(0);
                     }

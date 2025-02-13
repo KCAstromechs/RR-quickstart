@@ -10,6 +10,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
@@ -29,8 +30,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Config
 //@Disabled
-@Autonomous(name = "AutoLeft", group = "Autonomous")
-public class AutoLeft extends LinearOpMode {
+@Autonomous(name = "AutoLeftTestRR", group = "Autonomous")
+public class AutoLeftTestRR extends LinearOpMode {
 
 
     @Override
@@ -38,46 +39,26 @@ public class AutoLeft extends LinearOpMode {
         // instantiate your MecanumDrive at a particular pose.
         double initialX = 39;
         double initialY = 63.5;
-        double initialHeading = Math.toRadians(0);
+        double initialHeading = Math.toRadians(270);
         String auto_type = "get samples"; // change "park" to "get samples" depending on auto goal, vice versa
 
         Pose2d initialPose = new Pose2d(initialX, initialY, initialHeading);
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
-        // CREATE RR ATTACHMENT OBJECTS TODO need frontArm
+        // CREATE RR ATTACHMENT OBJECTS
         Lift lift = new Lift(hardwareMap);
         Grabber grabber = new Grabber(hardwareMap);
         Bucket bucket = new Bucket(hardwareMap);
-        Wrist wrist = new Wrist(hardwareMap);
-
 
 
         // vision here that outputs position
         int visionOutputPosition = 1;
+
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 // Whatever the heck we want to happen goes directly below
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
-                // split here and place sample in high basket
-//                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(52, 48))
-                // Get first ground sample
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
-                // place next sample in high basket
-                .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(62, 48))
-                // Get second ground sample
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
-                // place next sample in high basket
-                .strafeTo(new Vector2d(51, 13))
-                .turnTo(Math.toRadians(0))
-                .strafeTo(new Vector2d(33, 13))
-                // finish park
-                ;
+                .strafeTo(new Vector2d(50, 45))
+                .splineTo(new Vector2d(33, 13), Math.toRadians(180));
 
                 /*.strafeTo(new Vector2d(60, 50)) // might not need this
                 .strafeTo(new Vector2d(60, 36)) // might not need this
