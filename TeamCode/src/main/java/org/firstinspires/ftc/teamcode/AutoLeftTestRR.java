@@ -90,6 +90,7 @@ public class AutoLeftTestRR extends LinearOpMode {
         int startPosition = visionOutputPosition;
         telemetry.addData("Starting Position", startPosition);
         telemetry.update();
+
         waitForStart();
 
         if (isStopRequested()) return;
