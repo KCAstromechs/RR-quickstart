@@ -8,6 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class FrontArm {
+
+    private final double DOWN_POSITION = 290;
+    private final double UP_POSITION = 50;
+
+    private final double SPEED_LIMIT = 0.5; // 50% power/speed
     private DcMotor motor;
 
     public FrontArm(HardwareMap hardwareMap) {
@@ -19,7 +24,7 @@ public class FrontArm {
 
     }
 
-    public Action lower_arm() {
+    public Action lowerArm() {
         return new Action() {
             private boolean initialized = false;
 
@@ -27,29 +32,24 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    // TODO change 0 to 'low' frontArm position
-                    if (motor.getCurrentPosition() > 0) {
-                        while (motor.getCurrentPosition() > 0) {
-                            motor.setPower(-0.5);
-                        }
-                        motor.setPower(0);
-                    } else if (motor.getCurrentPosition() < 0) {
-                        while (motor.getCurrentPosition() < 0) {
-                            motor.setPower(0.5);
-                        }
-                        motor.setPower(0);
-                    }
+                    motor.setPower(SPEED_LIMIT);
                     initialized = true;
                 }
 
                 double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                return pos < 10_000.0;
+                if (pos > DOWN_POSITION) {
+                    motor.setPower(0);
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         };
     }
 
-    public Action raise_arm() {
+    public Action raiseArm() {
         return new Action() {
             private boolean initialized = false;
 
@@ -57,24 +57,19 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    // TODO change 0 to 'raised' frontArm position
-                    if (motor.getCurrentPosition() > 1350) {
-                        while (motor.getCurrentPosition() > 1350) {
-                            motor.setPower(-0.5);
-                        }
-                        motor.setPower(0);
-                    } else if (motor.getCurrentPosition() < 1350) {
-                        while (motor.getCurrentPosition() < 1350) {
-                            motor.setPower(0.5);
-                        }
-                        motor.setPower(0);
-                    }
+                    motor.setPower(-SPEED_LIMIT);
                     initialized = true;
                 }
 
                 double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                return pos < 10_000.0;
+                if (pos < UP_POSITION) {
+                    motor.setPower(0);
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         };
     }

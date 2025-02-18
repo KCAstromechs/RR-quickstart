@@ -8,6 +8,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Wrist {
+
+    private final double GROUND_POSITION = 0.75;
+    private final double SUB_POSITION = 0.9;
+    private final double BUCKET_POSITION = 0.55;
     private final Servo servo;
 
     public Wrist(HardwareMap hardwareMap) {
@@ -16,55 +20,33 @@ public class Wrist {
 
     public Action wrist_to_ground() {
         return new Action() {
-            private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    // RUN CODE HERE
-                    servo.setPosition(0.75);
-                    initialized = true;
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Wrist Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(GROUND_POSITION);
+                return false;
             }
         };
     }
 
     public Action wrist_to_sub() {
         return new Action() {
-            private boolean initialized = false;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    servo.setPosition(0.9);
-                    initialized = true;
-
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Wrist Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(SUB_POSITION);
+                return false;
             }
         };
     }
 
     public Action wrist_to_bucket() {
         return new Action() {
-            private boolean initialized = false;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    servo.setPosition(0.55);
-                    initialized = false;
-
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Wrist Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(BUCKET_POSITION);
+                return false;
             }
         };
     }

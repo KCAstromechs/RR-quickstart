@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Bucket {
+
+    private static final double FLIPPED_POSITION = 0;
+    private static final double NORMAL_POSITION = 0.67;
     private final Servo servo;
 
     public Bucket(HardwareMap hardwareMap) {
@@ -16,37 +19,22 @@ public class Bucket {
 
     public Action flip_bucket() {
         return new Action() {
-            private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    // RUN CODE HERE
-                    servo.setPosition(0);
-                    initialized = true;
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Bucket Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(FLIPPED_POSITION);
+                return false;
             }
         };
     }
 
     public Action reset_bucket() {
         return new Action() {
-            private boolean initialized = false;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    servo.setPosition(0.67);
-                    initialized = true;
-
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Bucket Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(NORMAL_POSITION);
+                return false;
             }
         };
     }

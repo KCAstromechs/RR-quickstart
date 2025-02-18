@@ -47,37 +47,46 @@ public class AutoLeft extends LinearOpMode {
 
         // CREATE RR ATTACHMENT OBJECTS TODO need frontArm
         Lift lift = new Lift(hardwareMap);
-        Grabber grabber = new Grabber(hardwareMap);
         Bucket bucket = new Bucket(hardwareMap);
+        Grabber grabber = new Grabber(hardwareMap);
         Wrist wrist = new Wrist(hardwareMap);
-
-
+        FrontArm frontArm = new FrontArm(hardwareMap);
 
         // vision here that outputs position
         int visionOutputPosition = 1;
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 // Whatever the heck we want to happen goes directly below
                 .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
+                .turnTo(Math.toRadians(45));
+
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
                 // split here and place sample in high basket
 //                .strafeTo(new Vector2d(52, 52))
                 .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(52, 48))
+                .strafeTo(new Vector2d(52, 48));
                 // Get first ground sample
+
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(52, 48, Math.toRadians(90)))
                 .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
+                .turnTo(Math.toRadians(45));
                 // place next sample in high basket
+
+        TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
                 .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(62, 48))
+                .strafeTo(new Vector2d(62, 48));
                 // Get second ground sample
+
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(62, 48, Math.toRadians(90)))
                 .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45))
+                .turnTo(Math.toRadians(45));
                 // place next sample in high basket
+
+        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
                 .strafeTo(new Vector2d(51, 13))
                 .turnTo(Math.toRadians(0))
-                .strafeTo(new Vector2d(33, 13))
+                .strafeTo(new Vector2d(33, 13));
                 // finish park
-                ;
+
 
                 /*.strafeTo(new Vector2d(60, 50)) // might not need this
                 .strafeTo(new Vector2d(60, 36)) // might not need this
@@ -86,10 +95,6 @@ public class AutoLeft extends LinearOpMode {
                 .strafeTo(new Vector2d(36, 5))
                 .strafeTo(new Vector2d(26, 5))
                 .waitSeconds(2);*/
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(54, 61.5, initialHeading))
-                .turnTo(Math.toRadians(45));
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(20, 11));
 
         Action trajectoryActionCloseOut = tab1.fresh()
 //                .strafeTo(new Vector2d(48, 12))
@@ -113,19 +118,19 @@ public class AutoLeft extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Action trajectoryActionChosen;
-
-        if (auto_type == "get samples") {
-            trajectoryActionChosen = tab1.build();
-        } else if (auto_type == "park") {
-            trajectoryActionChosen = tab2.build();
-        } else {
-            trajectoryActionChosen = tab2.build();
-        }
+//        Action trajectoryActionChosen;
+//
+//        if (auto_type == "get samples") {
+//            trajectoryActionChosen = tab1.build();
+//        } else if (auto_type == "park") {
+//            trajectoryActionChosen = tab2.build();
+//        } else {
+//            trajectoryActionChosen = tab2.build();
+//        }
 
         Actions.runBlocking(
                 new SequentialAction(
-                        trajectoryActionChosen
+                        tab1.build()
 
 //                        grabber.close_grabber(),
 //                        grabber.open_grabber(),

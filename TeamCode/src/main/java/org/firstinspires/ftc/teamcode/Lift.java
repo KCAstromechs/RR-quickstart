@@ -8,14 +8,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Lift {
-    private DcMotor lift;
+
+    private final double DOWN_POSITION = 50;
+    private final double UP_POSITION = 4000;
+    private final double SPEED_LIMIT_DOWN = 0.5; // 50% power/speed
+    private final double SPEED_LIMIT_UP = 1; // 100% power/speed
+    private DcMotor motor;
 
     public Lift(HardwareMap hardwareMap) {
         // Init the lift
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor = hardwareMap.get(DcMotor.class, "lift");
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -27,25 +32,19 @@ public class Lift {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    // TODO change 0 to 'low' lift position
-                    // TO DO is done
-                    if (lift.getCurrentPosition() > 50) {
-                        while (lift.getCurrentPosition() > 50) {
-                            lift.setPower(-0.5);
-                        }
-                        lift.setPower(0);
-                    } else if (lift.getCurrentPosition() < 50) {
-                        while (lift.getCurrentPosition() < 50) {
-                            lift.setPower(0.5);
-                        }
-                        lift.setPower(0);
-                    }
+                    motor.setPower(-SPEED_LIMIT_DOWN);
                     initialized = true;
                 }
 
-                double pos = lift.getCurrentPosition();
+                double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                return pos < 10_000.0;
+                if (pos < DOWN_POSITION) {
+                    motor.setPower(0);
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         };
     }
@@ -58,25 +57,19 @@ public class Lift {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    // TODO change 0 to 'raised' lift position
-                    // TO DO is done
-                    if (lift.getCurrentPosition() > 4000) {
-                        while (lift.getCurrentPosition() > 4000) {
-                            lift.setPower(-1);
-                        }
-                        lift.setPower(0);
-                    } else if (lift.getCurrentPosition() < 4000) {
-                        while (lift.getCurrentPosition() < 4000) {
-                            lift.setPower(1);
-                        }
-                        lift.setPower(0);
-                    }
+                    motor.setPower(SPEED_LIMIT_UP);
                     initialized = true;
                 }
 
-                double pos = lift.getCurrentPosition();
+                double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                return pos < 10_000.0;
+                if (pos > UP_POSITION) {
+                    motor.setPower(0);
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         };
     }

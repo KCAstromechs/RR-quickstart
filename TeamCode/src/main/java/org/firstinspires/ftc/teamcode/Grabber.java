@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Grabber {
+
+    public final double CLOSED_POSITION = 0.9;
+    public final double OPEN_POSITION = 0.65;
     private final Servo servo;
 
     public Grabber(HardwareMap hardwareMap) {
@@ -16,38 +19,22 @@ public class Grabber {
 
     public Action close_grabber() {
         return new Action() {
-            private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    // RUN CODE HERE
-                    servo.setPosition(.1);
-                    initialized = true;
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Grabber Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(CLOSED_POSITION);
+                return false;
             }
         };
     }
 
     public Action open_grabber() {
         return new Action() {
-            private  boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    // RUN CODE HERE
-                    servo.setPosition(0);
-                    initialized = true;
-                }
-
-                double pos = servo.getPosition();
-                packet.put("Grabber Pos", pos);
-                return pos < 10_000.0;
+                servo.setPosition(OPEN_POSITION);
+                return false;
             }
         };
     }
