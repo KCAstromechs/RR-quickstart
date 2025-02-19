@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -52,91 +53,149 @@ public class AutoLeft extends LinearOpMode {
         Wrist wrist = new Wrist(hardwareMap);
         FrontArm frontArm = new FrontArm(hardwareMap);
 
-        // vision here that outputs position
-        int visionOutputPosition = 1;
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                // Whatever the heck we want to happen goes directly below
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45));
+//        // vision here that outputs position
+//        int visionOutputPosition = 1;
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
-                // split here and place sample in high basket
+
+        // TODO fine tune these numbers / vectors
+        Vector2d basketPos = new Vector2d(52, 52);
+        double basketAngle = Math.toRadians(45);
+
+        Vector2d sample2Pos = new Vector2d(52, 48);
+        double sample2Angle = Math.toRadians(90);
+
+        Vector2d sample3Pos = new Vector2d(62, 48);
+        double sample3Angle = Math.toRadians(90);
+
+
+        Action tab1 = drive.actionBuilder(initialPose) // starts from start
+                // Whatever the heck we want to happen goes directly below
+                .strafeTo(basketPos)
+                .turnTo(Math.toRadians(basketAngle))
+                .build();
+                // place first sample into high basket
+
+        Action tab2 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
 //                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(52, 48));
+                .turnTo(sample2Angle)
+                .strafeTo(sample2Pos)
+                .build();
                 // Get first ground sample
 
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(52, 48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45));
+        Action tab3 = drive.actionBuilder(new Pose2d(sample2Pos, sample2Angle)) // starts from first ground sample
+                .strafeTo(basketPos)
+                .turnTo(basketAngle)
+                .build();
                 // place next sample in high basket
 
-        TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
-                .turnTo(Math.toRadians(90))
-                .strafeTo(new Vector2d(62, 48));
+        Action tab4 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
+                .turnTo(sample3Angle)
+                .strafeTo(sample3Pos)
+                .build();
                 // Get second ground sample
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(62, 48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(52, 52))
-                .turnTo(Math.toRadians(45));
+        Action tab5 = drive.actionBuilder(new Pose2d(sample3Pos, sample3Angle)) // starts from second ground sample
+                .strafeTo(basketPos)
+                .turnTo(basketAngle)
+                .build();
                 // place next sample in high basket
 
-        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(52, 52, Math.toRadians(45)))
+        Action park = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .strafeTo(new Vector2d(51, 13))
                 .turnTo(Math.toRadians(0))
-                .strafeTo(new Vector2d(33, 13));
+                .strafeTo(new Vector2d(33, 13))
+                .build();
                 // finish park
 
 
-                /*.strafeTo(new Vector2d(60, 50)) // might not need this
-                .strafeTo(new Vector2d(60, 36)) // might not need this
-                // THIS IS WHERE WE WILL PICK UP STUFF
-                .turnTo(Math.toRadians(180))
-                .strafeTo(new Vector2d(36, 5))
-                .strafeTo(new Vector2d(26, 5))
-                .waitSeconds(2);*/
-
-        Action trajectoryActionCloseOut = tab1.fresh()
-//                .strafeTo(new Vector2d(48, 12))
-//                .turn(Math.toRadians(360))
-                .waitSeconds(1)
-                .build();
-
-        // actions that need to happen on init; for instance, a claw tightening.
-//        Actions.runBlocking(claw.closeClaw());
-
-        while (!isStopRequested() && !opModeIsActive()) {
-            int position = visionOutputPosition;
-            telemetry.addData("Position during Init", position);
-            telemetry.update();
-        }
-
-        int startPosition = visionOutputPosition;
-        telemetry.addData("Starting Position", startPosition);
+        telemetry.addData("Starting Position", initialPose);
         telemetry.update();
         waitForStart();
 
         if (isStopRequested()) return;
 
-//        Action trajectoryActionChosen;
-//
-//        if (auto_type == "get samples") {
-//            trajectoryActionChosen = tab1.build();
-//        } else if (auto_type == "park") {
-//            trajectoryActionChosen = tab2.build();
-//        } else {
-//            trajectoryActionChosen = tab2.build();
-//        }
 
         Actions.runBlocking(
                 new SequentialAction(
-                        tab1.build()
+                        // first, do resets so things don't kaboom
+                        new ParallelAction(
+                                bucket.reset_bucket(),
+                                wrist.wrist_to_sub(),
+                                grabber.open_grabber()
+                        ),
 
-//                        grabber.close_grabber(),
-//                        grabber.open_grabber(),
-//                        lift.raise_lift(),
-//                        tab3.build()   //,
-//                        trajectoryActionCloseOut
+                        // then, go to high basket and place first sample
+                        new ParallelAction(
+                                tab1,
+                                lift.raise_lift()
+                        ),
+                        bucket.flip_bucket(),
+                        new SleepAction(1),
+                        bucket.reset_bucket(), // may need wait time here
+
+                        // then, get first ground sample
+                        new ParallelAction(
+                                lift.lower_lift(),
+                                tab2
+                        ),
+                        new ParallelAction(
+                                wrist.wrist_to_ground(),
+                                frontArm.lowerArm(),
+                                grabber.open_grabber() // may not need this
+                        ),
+                        new SleepAction(1),
+                        grabber.close_grabber(),
+                        new ParallelAction(
+                                frontArm.raiseArm(),
+                                wrist.wrist_to_bucket()
+                        ),
+                        new SleepAction(1),
+                        grabber.open_grabber(),
+                        new SleepAction(0.5),
+                        wrist.wrist_to_sub(),
+
+                        // then, put first ground sample into high basket
+                        new ParallelAction(
+                                lift.raise_lift(),
+                                tab3
+                        ),
+                        bucket.flip_bucket(),
+                        new SleepAction(1),
+                        bucket.reset_bucket(), // may need wait time here
+
+                        // then, get second ground sample
+                        new ParallelAction(
+                                lift.lower_lift(),
+                                tab4
+                        ),
+                        new ParallelAction(
+                                wrist.wrist_to_ground(),
+                                frontArm.lowerArm(),
+                                grabber.open_grabber() // may not need this
+                        ),
+                        new SleepAction(1),
+                        grabber.close_grabber(),
+                        new ParallelAction(
+                                frontArm.raiseArm(),
+                                wrist.wrist_to_bucket()
+                        ),
+                        new SleepAction(1),
+                        grabber.open_grabber(),
+                        new SleepAction(0.5),
+                        wrist.wrist_to_sub(),
+
+                        // then put second ground sample into high basket
+                        new ParallelAction(
+                                lift.raise_lift(),
+                                tab5
+                        ),
+                        bucket.flip_bucket(),
+                        new SleepAction(1),
+                        bucket.reset_bucket()//, // may need wait time here
+
+//                        // then park
+//                        park
+
                 )
         );
 

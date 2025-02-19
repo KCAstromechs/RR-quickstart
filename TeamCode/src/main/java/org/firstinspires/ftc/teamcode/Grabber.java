@@ -2,15 +2,21 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class Grabber {
 
-    public final double CLOSED_POSITION = 0.9;
-    public final double OPEN_POSITION = 0.65;
+    public static class Params {
+        public double closedPosition = 0.9;
+        public double openPosition = 0.65;
+    }
+
+    public static Params PARAMS = new Params();
     private final Servo servo;
 
     public Grabber(HardwareMap hardwareMap) {
@@ -22,7 +28,7 @@ public class Grabber {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                servo.setPosition(CLOSED_POSITION);
+                servo.setPosition(PARAMS.closedPosition);
                 return false;
             }
         };
@@ -33,7 +39,7 @@ public class Grabber {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                servo.setPosition(OPEN_POSITION);
+                servo.setPosition(PARAMS.openPosition);
                 return false;
             }
         };

@@ -2,17 +2,24 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Config
 public class FrontArm {
 
-    private final double DOWN_POSITION = 290;
-    private final double UP_POSITION = 50;
+    public static class Params{
 
-    private final double SPEED_LIMIT = 0.5; // 50% power/speed
+        public double downPosition = 290;
+        public double upPosition = 50;
+        public double speedLimit = 0.5;  // 50% power/speed
+
+    }
+
+    public static Params PARAMS = new Params();
     private DcMotor motor;
 
     public FrontArm(HardwareMap hardwareMap) {
@@ -23,7 +30,6 @@ public class FrontArm {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
-
     public Action lowerArm() {
         return new Action() {
             private boolean initialized = false;
@@ -32,13 +38,13 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    motor.setPower(SPEED_LIMIT);
+                    motor.setPower(PARAMS.speedLimit);
                     initialized = true;
                 }
 
                 double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                if (pos > DOWN_POSITION) {
+                if (pos > PARAMS.downPosition) {
                     motor.setPower(0);
                     return false;
                 }
@@ -57,13 +63,13 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    motor.setPower(-SPEED_LIMIT);
+                    motor.setPower(-PARAMS.speedLimit);
                     initialized = true;
                 }
 
                 double pos = motor.getCurrentPosition();
                 packet.put("Lift Pos", pos);
-                if (pos < UP_POSITION) {
+                if (pos < PARAMS.upPosition) {
                     motor.setPower(0);
                     return false;
                 }

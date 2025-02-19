@@ -2,17 +2,24 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class Bucket {
 
-    private static final double FLIPPED_POSITION = 0;
-    private static final double NORMAL_POSITION = 0.67;
-    private final Servo servo;
+    public static class Params {
+        public double flippedPosition = 0;
+        public double normalPosition = 0.67;
 
+    }
+
+    public static Params PARAMS = new Params();
+
+    private final Servo servo;
     public Bucket(HardwareMap hardwareMap) {
         servo = hardwareMap.get(Servo.class, "bucket");
     }
@@ -22,7 +29,7 @@ public class Bucket {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                servo.setPosition(FLIPPED_POSITION);
+                servo.setPosition(PARAMS.flippedPosition);
                 return false;
             }
         };
@@ -33,7 +40,7 @@ public class Bucket {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                servo.setPosition(NORMAL_POSITION);
+                servo.setPosition(PARAMS.normalPosition);
                 return false;
             }
         };
