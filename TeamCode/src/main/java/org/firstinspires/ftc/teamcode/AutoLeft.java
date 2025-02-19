@@ -1,4 +1,4 @@
-// In this auto,
+// In this auto, [insert robot dimensions]
 
 package org.firstinspires.ftc.teamcode;
 
@@ -21,11 +21,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 @Config
@@ -58,52 +54,50 @@ public class AutoLeft extends LinearOpMode {
 
 
         // TODO fine tune these numbers / vectors
-        Vector2d basketPos = new Vector2d(52, 52);
+        Vector2d basketPos = new Vector2d(57, 57);
         double basketAngle = Math.toRadians(45);
 
-        Vector2d sample2Pos = new Vector2d(52, 48);
+        Vector2d sample2Pos = new Vector2d(49, 45);
         double sample2Angle = Math.toRadians(90);
 
-        Vector2d sample3Pos = new Vector2d(62, 48);
+        Vector2d sample3Pos = new Vector2d(60, 45);
         double sample3Angle = Math.toRadians(90);
 
 
-        Action tab1 = drive.actionBuilder(initialPose) // starts from start
-                // Whatever the heck we want to happen goes directly below
+        Action toP1 = drive.actionBuilder(initialPose) // starts from start
                 .strafeTo(basketPos)
                 .turnTo(Math.toRadians(basketAngle))
                 .build();
                 // place first sample into high basket
 
-        Action tab2 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
-//                .strafeTo(new Vector2d(52, 52))
+        Action toP2 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .turnTo(sample2Angle)
                 .strafeTo(sample2Pos)
                 .build();
                 // Get first ground sample
 
-        Action tab3 = drive.actionBuilder(new Pose2d(sample2Pos, sample2Angle)) // starts from first ground sample
+        Action toP3 = drive.actionBuilder(new Pose2d(sample2Pos, sample2Angle)) // starts from first ground sample
                 .strafeTo(basketPos)
                 .turnTo(basketAngle)
                 .build();
                 // place next sample in high basket
 
-        Action tab4 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
+        Action toP4 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .turnTo(sample3Angle)
                 .strafeTo(sample3Pos)
                 .build();
                 // Get second ground sample
 
-        Action tab5 = drive.actionBuilder(new Pose2d(sample3Pos, sample3Angle)) // starts from second ground sample
+        Action toP5 = drive.actionBuilder(new Pose2d(sample3Pos, sample3Angle)) // starts from second ground sample
                 .strafeTo(basketPos)
                 .turnTo(basketAngle)
                 .build();
                 // place next sample in high basket
 
         Action park = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
-                .strafeTo(new Vector2d(51, 13))
+                .strafeTo(new Vector2d(51, 7))
                 .turnTo(Math.toRadians(0))
-                .strafeTo(new Vector2d(33, 13))
+                .strafeTo(new Vector2d(24, 7))
                 .build();
                 // finish park
 
@@ -126,7 +120,7 @@ public class AutoLeft extends LinearOpMode {
 
                         // then, go to high basket and place first sample
                         new ParallelAction(
-                                tab1,
+                                toP1,
                                 lift.raise_lift()
                         ),
                         bucket.flip_bucket(),
@@ -136,7 +130,7 @@ public class AutoLeft extends LinearOpMode {
                         // then, get first ground sample
                         new ParallelAction(
                                 lift.lower_lift(),
-                                tab2
+                                toP2
                         ),
                         new ParallelAction(
                                 wrist.wrist_to_ground(),
@@ -157,7 +151,7 @@ public class AutoLeft extends LinearOpMode {
                         // then, put first ground sample into high basket
                         new ParallelAction(
                                 lift.raise_lift(),
-                                tab3
+                                toP3
                         ),
                         bucket.flip_bucket(),
                         new SleepAction(1),
@@ -166,7 +160,7 @@ public class AutoLeft extends LinearOpMode {
                         // then, get second ground sample
                         new ParallelAction(
                                 lift.lower_lift(),
-                                tab4
+                                toP4
                         ),
                         new ParallelAction(
                                 wrist.wrist_to_ground(),
@@ -187,7 +181,7 @@ public class AutoLeft extends LinearOpMode {
                         // then put second ground sample into high basket
                         new ParallelAction(
                                 lift.raise_lift(),
-                                tab5
+                                toP5
                         ),
                         bucket.flip_bucket(),
                         new SleepAction(1),

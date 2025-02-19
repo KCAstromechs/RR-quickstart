@@ -60,13 +60,7 @@ public class AutoLeftTestRR extends LinearOpMode {
                 .strafeTo(new Vector2d(50, 45))
                 .splineTo(new Vector2d(33, 13), Math.toRadians(180));
 
-                /*.strafeTo(new Vector2d(60, 50)) // might not need this
-                .strafeTo(new Vector2d(60, 36)) // might not need this
-                // THIS IS WHERE WE WILL PICK UP STUFF
-                .turnTo(Math.toRadians(180))
-                .strafeTo(new Vector2d(36, 5))
-                .strafeTo(new Vector2d(26, 5))
-                .waitSeconds(2);*/
+
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(54, 61.5, initialHeading))
                 .turnTo(Math.toRadians(45));
         TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
