@@ -38,7 +38,7 @@ public class AutoLeftTestRR extends LinearOpMode {
     public void runOpMode() { //throws InterruptedException
         // instantiate your MecanumDrive at a particular pose.
         double initialX = 39;
-        double initialY = 63.5;
+        double initialY = 63;
         double initialHeading = Math.toRadians(270);
         String auto_type = "get samples"; // change "park" to "get samples" depending on auto goal, vice versa
 
@@ -50,6 +50,7 @@ public class AutoLeftTestRR extends LinearOpMode {
         Lift lift = new Lift(hardwareMap);
         Grabber grabber = new Grabber(hardwareMap);
         Bucket bucket = new Bucket(hardwareMap);
+        FrontArm frontArm = new FrontArm(hardwareMap);
 
 
         // vision here that outputs position
@@ -61,8 +62,8 @@ public class AutoLeftTestRR extends LinearOpMode {
                 .splineTo(new Vector2d(33, 13), Math.toRadians(180));
 
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(54, 61.5, initialHeading))
-                .turnTo(Math.toRadians(45));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose) // new Pose2d(54, 61.5, initialHeading)
+                .strafeTo(new Vector2d(39, 51));
         TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(20, 11));
 
@@ -102,7 +103,7 @@ public class AutoLeftTestRR extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         trajectoryActionChosen
-
+//                          frontArm.lowerArm()
 //                        grabber.close_grabber(),
 //                        grabber.open_grabber(),
 //                        lift.raise_lift(),

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Bucket {
 
     public static class Params {
-        public double flippedPosition = 0;
+        public double flippedPosition = 0.1;
         public double normalPosition = 0.67;
 
     }

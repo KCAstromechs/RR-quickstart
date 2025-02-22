@@ -13,8 +13,8 @@ public class FrontArm {
 
     public static class Params{
 
-        public double downPosition = 290;
-        public double upPosition = 50;
+        public double downPosition = 240;
+        public double upPosition = 20;
         public double speedLimit = 0.5;  // 50% power/speed
 
     }
@@ -24,7 +24,7 @@ public class FrontArm {
 
     public FrontArm(HardwareMap hardwareMap) {
         // Init the lift
-        motor = hardwareMap.get(DcMotor.class, "lift");
+        motor = hardwareMap.get(DcMotor.class, "frontArm");
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
