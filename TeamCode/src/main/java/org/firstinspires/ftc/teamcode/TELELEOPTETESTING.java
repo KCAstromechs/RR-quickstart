@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,8 +18,47 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp(name = "TELELEOPTETESTING (Java)")
+@Config
+@TeleOp(name = "TELELEOPTETESTING (Java)", group = "competition")
 public class TELELEOPTETESTING extends LinearOpMode {
+
+    // WRIST stuff
+    public static class WristParams {
+        public double groundPosition = 0.75;
+        public double subPosition = 0.9;
+        public double bucketPosition = 0.55;
+    }
+    // LIFT stuff
+    public static class LiftParams {
+        public double upPosition = 4000;
+        public double downPosition = 50;
+        public double speedLimitDown = 0.5; // 50% power/speed
+        public double speedLimitUp = 1; // 100% power/speed
+    }
+    // GRABBER stuff
+    public static class GrabberParams {
+        public double closedPosition = 0.9;
+        public double openPosition = 0.65;
+    }
+    // BUCKET stuff
+    public static class BucketParams {
+        public double flippedPosition = 0.1;
+        public double normalPosition = 0.67;
+    }
+    // FRONT ARM stuff
+    public static class FrontArmParams {
+        public double downPosition = 240;
+        public double upPosition = 20;
+        public double speedLimit = 0.5;  // 50% power/speed
+        public double autoRangeLimPos = 50;
+    }
+
+    // Paramamamamameters
+    public static WristParams WRISTPARAMS = new WristParams();
+    public static LiftParams LIFTPARAMS =  new LiftParams();
+    public static GrabberParams GRABBERPARAMS = new GrabberParams();
+    public static BucketParams BUCKETPARAMS = new BucketParams();
+    public static FrontArmParams FRONTARMPARAMS = new FrontArmParams();
 
     // Drive Motors
     private DcMotor leftBack;
@@ -136,6 +176,8 @@ public class TELELEOPTETESTING extends LinearOpMode {
 
                 yawAngle = orientation.getYaw(AngleUnit.RADIANS);
 
+                auto_wrist_rotate = (frontArm.getCurrentPosition() < FRONTARMPARAMS.autoRangeLimPos); // don't mind the name of the constant
+
                 // Uncomment this line when possible
                 double theta = yawAngle;
                 // PI / 2; = 90 degrees (in terms of radians)
@@ -188,31 +230,32 @@ public class TELELEOPTETESTING extends LinearOpMode {
                 // GRABBER
                 // close grabber if either bumpers/ trigger is pressed
                 if (gamepad2.left_trigger >= .5 || gamepad2.right_trigger >= .5 || gamepad2.left_bumper || gamepad2.right_bumper) {
-                    grabber.setPosition(.9);
+                    grabber.setPosition(GRABBERPARAMS.closedPosition);
                     telemetry.addData("Grabber status", "closed");
                 } else { // open grabber when bumpers/ triggers are not pressed
-                    grabber.setPosition(.65);
+                    grabber.setPosition(GRABBERPARAMS.openPosition);
                     telemetry.addData("Grabber status", "open");
                 }
 
                 // WRIST
                 if (gamepad2.a) {
-                    wrist_pos = .9; // sub - A
-                    auto_wrist_rotate = false;
+                    wrist_pos = WRISTPARAMS.subPosition; // sub - A
                 } else if (gamepad2.b) {
-                    wrist_pos = .75; // ground - B
+                    wrist_pos = WRISTPARAMS.groundPosition; // ground - B
                 } else if (gamepad2.x) {
-                    wrist_pos = .6; // bucket - X
-                    auto_wrist_rotate = true;
-                } else if (gamepad2.left_stick_y < 0 && auto_wrist_rotate) { // this is some stuff for ricky
+                    wrist_pos = WRISTPARAMS.bucketPosition; // bucket - X
+                } else if (gamepad2.left_stick_y < 0 && auto_wrist_rotate) { // when front arm go up and front arm is within auto range, wrist to bucket
                     // if left stick / frontArm goes up, then flip wrist to bucket
-                    wrist_pos = .6; // bucket
-                } else if (gamepad2.left_stick_y > 0 && auto_wrist_rotate) {
+                    wrist_pos = WRISTPARAMS.bucketPosition; // bucket
+                } else if (gamepad2.left_stick_y > 0 && auto_wrist_rotate) { // when front arm go down and front arm is within auto range, wrist to ground
                     // if left stick / frontArm goes down, then flip wrist to ground
-                    wrist_pos = .75;
+                    wrist_pos = WRISTPARAMS.groundPosition;
+                }
+                if (frontArm.getCurrentPosition() < FRONTARMPARAMS.autoRangeLimPos && lift.getPower() > 0) {    // if lift is going down AND front arm is folded in, flip wrist to sub
+                    wrist_pos = WRISTPARAMS.subPosition;
                 }
 
-                // normalization (actually no this is
+                // normalization (actually no this is beans... idk what I actually put here
                 if (wrist_pos != -1) {
                     if (gamepad2.dpad_down) {
                         wrist_pos += .1;
@@ -231,11 +274,9 @@ public class TELELEOPTETESTING extends LinearOpMode {
 
                 // BUCKET CRAP
                 if (gamepad2.y) {
-                    bucket.setPosition(0); // flipped backward
-                } else if (gamepad2.dpad_left) {
-                    bucket.setPosition(0.6); // old norm
+                    bucket.setPosition(BUCKETPARAMS.flippedPosition); // flipped backward
                 } else {
-                    bucket.setPosition(0.67);// test/new norm
+                    bucket.setPosition(BUCKETPARAMS.normalPosition); // normal position
                 }
 
                 // LIFT CRAP

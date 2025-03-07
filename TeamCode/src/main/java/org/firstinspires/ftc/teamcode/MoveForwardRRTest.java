@@ -27,8 +27,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 //@Disabled
-@Autonomous(name = "AutoLeft", group = "competition", preselectTeleOp = "TELELEOPTETESTING (Java)")
-public class AutoLeft extends LinearOpMode {
+@Autonomous(name = "MoveForwardRRTest", group = "testing", preselectTeleOp = "TELELEOPTETESTING (Java)")
+public class MoveForwardRRTest extends LinearOpMode {
 
     public static class Params {
         public double basketX = 62;
@@ -98,31 +98,31 @@ public class AutoLeft extends LinearOpMode {
                 .strafeTo(basketPos)
                 .turnTo(basketAngle)
                 .build();
-                // place first sample into high basket
+        // place first sample into high basket
 
         Action toP2 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .turnTo(sample2Angle)
                 .strafeTo(sample2Pos)
                 .build();
-                // Get first ground sample
+        // Get first ground sample
 
         Action toP3 = drive.actionBuilder(new Pose2d(sample2Pos, sample2Angle)) // starts from first ground sample
                 .strafeTo(basketPos)
                 .turnTo(basketAngle2)
                 .build();
-                // place next sample in high basket
+        // place next sample in high basket
 
         Action toP4 = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .turnTo(sample3Angle)
                 .strafeTo(sample3Pos)
                 .build();
-                // Get second ground sample
+        // Get second ground sample
 
         Action toP5 = drive.actionBuilder(new Pose2d(sample3Pos, sample3Angle)) // starts from second ground sample
                 .strafeTo(basketPos)
                 .turnTo(basketAngle3)
                 .build();
-                // place next sample in high basket
+        // place next sample in high basket
 
         Action toP6 = drive.actionBuilder(new Pose2d(basketPos, basketAngle))
                 .strafeTo(sample4Pos)
@@ -134,16 +134,12 @@ public class AutoLeft extends LinearOpMode {
                 .turnTo(basketAngle4)
                 .build();
 
-        Action to270degrees = drive.actionBuilder(new Pose2d(basketPos, basketAngle))
-                .turnTo(Math.toRadians(270))
-                .build();
-
         Action park = drive.actionBuilder(new Pose2d(basketPos, basketAngle)) // starts from basket
                 .strafeTo(new Vector2d(51, 7))
                 .turnTo(Math.toRadians(0))
                 .strafeTo(new Vector2d(24, 7))
                 .build();
-                // finish park
+        // finish park
 
 
         telemetry.addData("Starting Position", initialPose);
@@ -253,9 +249,7 @@ public class AutoLeft extends LinearOpMode {
                         ),
                         bucket.flip_bucket(),
                         new SleepAction(1),
-                        bucket.reset_bucket(), // may need wait time here
-
-                        to270degrees
+                        bucket.reset_bucket()//, // may need wait time here
 
 //                        // then park
 //                        park

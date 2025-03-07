@@ -29,7 +29,7 @@ import java.util.Vector;
 
 @Config
 //@Disabled
-@Autonomous(name = "AutoRight", preselectTeleOp = "TELELEOPTETESTING (Java)")
+@Autonomous(name = "AutoRight", group = "competition", preselectTeleOp = "TELELEOPTETESTING (Java)")
 public class AutoRight extends LinearOpMode {
 
 //    public class Lift {

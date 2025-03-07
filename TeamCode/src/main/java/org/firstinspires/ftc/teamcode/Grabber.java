@@ -13,7 +13,7 @@ public class Grabber {
 
     public static class Params {
         public double closedPosition = 0.9;
-        public double openPosition = 0.65;
+        public double openPosition = 0.60;
     }
 
     public static Params PARAMS = new Params();
