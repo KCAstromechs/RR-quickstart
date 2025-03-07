@@ -53,130 +53,7 @@ public class AutoRight extends LinearOpMode {
         Pose2d initialPose = new Pose2d(initialX, initialY, initialHeading);
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-
-        // make a Grabber instance
-       class Grabber {
-           private Servo servo;
-
-           public Grabber(HardwareMap hardwareMap) {
-               servo = hardwareMap.get(Servo.class, "GrabberServo");
-           }
-
-           public Action close_grabber() {
-               return new Action() {
-                   private boolean initialized = false;
-
-                   @Override
-                   public boolean run(@NonNull TelemetryPacket packet) {
-                       if (!initialized) {
-                           // RUN CODE HERE
-                           servo.setPosition(0);
-                           initialized = true;
-                       }
-
-                       double pos = servo.getPosition();
-                       packet.put("Grabber Pos", pos);
-                       return pos < 10_000.0;
-                   }
-               };
-           }
-
-           public Action open_grabber() {
-               return new Action() {
-                   private  boolean initialized = false;
-
-                   @Override
-                   public boolean run(@NonNull TelemetryPacket packet) {
-                       if (!initialized) {
-                           // RUN CODE HERE
-                           servo.setPosition(10);
-                           initialized = true;
-                       }
-
-                       double pos = servo.getPosition();
-                       packet.put("Grabber Pos", pos);
-                       return pos < 10_000.0;
-                   }
-               };
-           }
-       }
-
-       // make a Lift instance
-       class Lift {
-           private DcMotor lift;
-
-           public Lift(HardwareMap hardwareMap) {
-               // Init the lift
-               lift = hardwareMap.get(DcMotor.class, "lift");
-               lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-               lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-               lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-           }
-
-           public Action lower_lift() {
-               return new Action() {
-                   private boolean initialized = false;
-
-                   @Override
-                   public boolean run(@NonNull TelemetryPacket packet) {
-                       if (!initialized) {
-                           // RUN CODE HERE
-                           // TODO change 0 to 'low' lift position
-                           if (lift.getCurrentPosition() > 0) {
-                               while (lift.getCurrentPosition() > 0) {
-                                   lift.setPower(0.5);
-                               }
-                               lift.setPower(0);
-                           } else if (lift.getCurrentPosition() < 0) {
-                               while (lift.getCurrentPosition() < 0) {
-                                   lift.setPower(-0.5);
-                               }
-                               lift.setPower(0);
-                           }
-                           initialized = true;
-                       }
-
-                       double pos = lift.getCurrentPosition();
-                       packet.put("Lift Pos", pos);
-                       return pos < 10_000.0;
-                   }
-               };
-           }
-
-           public Action raise_lift() {
-               return new Action() {
-                   private boolean initialized = false;
-
-                   @Override
-                   public boolean run(@NonNull TelemetryPacket packet) {
-                       if (!initialized) {
-                           // RUN CODE HERE
-                           // TODO change 0 to 'raised' lift position
-                           if (lift.getCurrentPosition() > 0) {
-                               while (lift.getCurrentPosition() > 0) {
-                                   lift.setPower(0.5);
-                               }
-                               lift.setPower(0);
-                           } else if (lift.getCurrentPosition() < 0) {
-                               while (lift.getCurrentPosition() < 0) {
-                                   lift.setPower(-0.5);
-                               }
-                               lift.setPower(0);
-                           }
-                           initialized = true;
-                       }
-
-                       double pos = lift.getCurrentPosition();
-                       packet.put("Lift Pos", pos);
-                       return pos < 10_000.0;
-                   }
-               };
-           }
-       }
-
-
-        // vision here that outputs position
-        int visionOutputPosition = 1;
+        // make attachments
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 // Whatever the heck we want to happen goes directly below
@@ -201,18 +78,8 @@ public class AutoRight extends LinearOpMode {
                 .strafeTo(new Vector2d(initialX, initialY))
                 .waitSeconds(1)
                 .build();
+        
 
-        // actions that need to happen on init; for instance, a claw tightening.
-//        Actions.runBlocking(claw.closeClaw());
-
-        while (!isStopRequested() && !opModeIsActive()) {
-            int position = visionOutputPosition;
-            telemetry.addData("Position during Init", position);
-            telemetry.update();
-        }
-
-        int startPosition = visionOutputPosition;
-        telemetry.addData("Starting Position", startPosition);
         telemetry.update();
         waitForStart();
 
