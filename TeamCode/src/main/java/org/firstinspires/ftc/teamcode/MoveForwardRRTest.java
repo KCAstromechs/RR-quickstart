@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
 @Config
-//@Disabled
+@Disabled
 @Autonomous(name = "MoveForwardRRTest", group = "testing", preselectTeleOp = "TELELEOPTETESTING (Java)")
 public class MoveForwardRRTest extends LinearOpMode {
 

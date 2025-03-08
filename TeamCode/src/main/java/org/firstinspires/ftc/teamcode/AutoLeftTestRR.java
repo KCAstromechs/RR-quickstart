@@ -29,7 +29,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 @Config
-//@Disabled
+@Disabled
 @Autonomous(name = "AutoLeftTestRR", group = "Autonomous")
 public class AutoLeftTestRR extends LinearOpMode {
 
