@@ -32,8 +32,6 @@ public class TELELEOPTETESTING extends LinearOpMode {
     public static class LiftParams {
         public double upPosition = 4000;
         public double downPosition = 50;
-        public double speedLimitDown = 0.5; // 50% power/speed
-        public double speedLimitUp = 1; // 100% power/speed
     }
     // GRABBER stuff
     public static class GrabberParams {
@@ -135,16 +133,6 @@ public class TELELEOPTETESTING extends LinearOpMode {
         frontArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // TODO CHANGE THIS MAYBE
-        // Lift stuff
-        double lift_speed_limit = .5;
-
-        // TODO CHANGE THIS CRAPADAP
-        double lift_minPos = -320.0; // highest point (up on robot)
-        double lift_maxPos = 10.0; // lowest point (fwd on robot)
-
-        double lift_power;
 
         // Wrist stuff
         double wrist_pos = -1;
@@ -281,10 +269,17 @@ public class TELELEOPTETESTING extends LinearOpMode {
 
                 // LIFT CRAP
                 // TODO Add limiter?
-                lift.setPower(-gamepad2.right_stick_y); // speed limit used to be .7
+                lift.setPower(-gamepad2.right_stick_y);
 
                 // FRONT ARM CRAP
-                frontArm.setPower(gamepad2.left_stick_y * .5); // speed limit used to be .7
+                frontArm.setPower(gamepad2.left_stick_y * FRONTARMPARAMS.speedLimit);
+
+                // frontArm reset
+                if (gamepad2.dpad_left) {
+                    frontArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    frontArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    frontArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                }
 
                 // negative front arm power is up
 

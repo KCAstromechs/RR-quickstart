@@ -14,8 +14,9 @@ public class FrontArm {
     public static class Params{
 
         public double downPosition = 240;
-        public double upPosition = 20;
-        public double speedLimit = 0.5;  // 50% power/speed
+        public double upPosition = 5;
+        public double speedLimitUp = 0.50; // 50% power/speed
+        public double speedLimitDown = 0.40; // 40% power/speed
 
     }
 
@@ -38,7 +39,7 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    motor.setPower(PARAMS.speedLimit);
+                    motor.setPower(PARAMS.speedLimitDown);
                     initialized = true;
                 }
 
@@ -63,7 +64,7 @@ public class FrontArm {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // RUN CODE HERE
-                    motor.setPower(-PARAMS.speedLimit);
+                    motor.setPower(-PARAMS.speedLimitUp);
                     initialized = true;
                 }
 

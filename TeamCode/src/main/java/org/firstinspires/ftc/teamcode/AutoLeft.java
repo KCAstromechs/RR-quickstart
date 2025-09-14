@@ -47,8 +47,8 @@ public class AutoLeft extends LinearOpMode {
         public double sample3Y = 52;
         public double sample3Angle = 90;
 
-        public double sample4X = 52.5;
-        public double sample4Y = 44;
+        public double sample4X = 53.5;
+        public double sample4Y = 43.5;
         public double sample4Angle = 135;
     }
 
