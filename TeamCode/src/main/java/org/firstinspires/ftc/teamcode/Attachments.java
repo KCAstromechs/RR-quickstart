@@ -68,8 +68,8 @@ public class Attachments {
                     // TODO change powers to 0.8?
                     initialized = true;
                 }
-                leftRPM = outtakeLeft.getVelocity() / leftTPR;
-                rightRPM = outtakeRight.getVelocity() / rightTPR;
+                leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
+                rightRPM = 60 * (outtakeRight.getVelocity() / rightTPR);
                 canShoot = (leftRPM > targetRPM && rightRPM > targetRPM);
 
                 packet.put("Left RPM", leftRPM);
@@ -103,6 +103,8 @@ public class Attachments {
                 }
 
                 // constantly update progression & intake
+                leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
+                rightRPM = 60 * (outtakeRight.getVelocity() / rightTPR);
                 canShoot = (leftRPM > targetRPM && rightRPM > targetRPM);
                 if (canShoot) {
                     progression.setPower(1);

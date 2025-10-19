@@ -18,5 +18,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 @Autonomous(name = "AutoRedClose", group = "Red Side")
-public class AutoRedClose {
+public class AutoRedClose extends LinearOpMode{
+
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

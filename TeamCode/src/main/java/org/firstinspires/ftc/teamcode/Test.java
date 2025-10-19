@@ -244,6 +244,7 @@ public class Test extends LinearOpMode {
             telemetry.addData("Shooter Percentage", shooterPercent *100 + " %");
             telemetry.addData("RPM of shooterLeft", leftRPM); // (ticksPerSec/ticksPerRev) * 60
             telemetry.addData("RPM of shooterRight", rightRPM ); // (ticksPerSec/ticksPerRev) * 60sd
+            telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
