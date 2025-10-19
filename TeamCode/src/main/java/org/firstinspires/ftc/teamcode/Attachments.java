@@ -21,10 +21,12 @@ public class Attachments {
     private double rightTPR;
     private boolean canShoot;
 
-
     // Progression & intake
     private DcMotorEx progression;
     private DcMotorEx intake;
+
+    // timer
+    private ElapsedTime timer = new ElapsedTime();
 
     // THE ONLY CONSTRUCTOR
     public Attachments(HardwareMap hardwareMap) {
@@ -51,8 +53,8 @@ public class Attachments {
 
     /** Spins up shooter motors and ends once motors reach targetRPM
      *
-     * @param targetRPM the desired RPM for shooters to spin up before firing(recommended for m1: 95 RPM)
-     * @return
+     * @param targetRPM the desired RPM for shooters to spin up before firing (recommended for m1: 95 RPM)
+     * @return returns false once both motors reach targetRPM
      */
     public Action spinUp(double targetRPM) {
         return new Action() {
@@ -81,12 +83,11 @@ public class Attachments {
     /** Fires one artifact for s seconds
      *
      * @param durationSeconds (double) number of seconds you want to continuously shoot
-     * @return
+     * @return returns false after shooter, progression, and intake run for durationSeconds seconds
      */
     public Action fireArtifact(double durationSeconds, double targetRPM) {
         return new Action() {
             private boolean initialized = false;
-            private ElapsedTime timer = new ElapsedTime();
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -112,9 +113,9 @@ public class Attachments {
                 }
 
                 double elapsed = timer.seconds();
-                packet.put("Shooting timer", elapsed); // telemtry
+                packet.put("Shooting timer", elapsed); // telemetry
 
-                if (elapsed >= durationSeconds) {
+                if (elapsed >= durationSeconds) { // check if timer is done
                     // stop all motors
                     progression.setPower(0);
                     intake.setPower(0);
@@ -130,5 +131,39 @@ public class Attachments {
         };
     }
 
-    // TODO add intake Action
+    /**
+     * @param durationSeconds The amount of seconds to run intake
+     * @return returns false after intake runs for durationSeconds seconds
+     */
+    public Action intake(double durationSeconds) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    intake.setPower(1); // turn on intake
+
+                    timer.reset(); // reset/start timer
+                    initialized = true;
+                }
+
+                double elapsed = timer.seconds();
+                packet.put("Intaking", true);
+
+                if (elapsed >= durationSeconds) { // check if timer is done
+                    // stop all motors
+                    progression.setPower(0);
+                    intake.setPower(0);
+
+                    outtakeLeft.setPower(0);
+                    outtakeRight.setPower(0);
+
+                    return false; // action finished
+                }
+
+                return true; // keep intaking until timer reaches target time
+            }
+        };
+    }
 }
