@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,8 +11,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Config
 public class Attachments {
     // INSTANCE VARS
+    // Params
+    public static class Params {
+        private double shooterSetSpeed = 0.7; // 0.7 = %70
+        // TODO change setSpeed to 0.8? ... testing required
+    }
+    public static Params params = new Params();
+
     // Shooters
     private DcMotorEx outtakeLeft;
     private double leftRPM;
@@ -63,9 +72,8 @@ public class Attachments {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtakeLeft.setPower(0.7);
-                    outtakeRight.setPower(0.7);
-                    // TODO change powers to 0.8?
+                    outtakeLeft.setPower(params.shooterSetSpeed);
+                    outtakeRight.setPower(params.shooterSetSpeed);
                     initialized = true;
                 }
                 leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
@@ -93,9 +101,8 @@ public class Attachments {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // continue outtaking
-                    outtakeLeft.setPower(0.7);
-                    outtakeRight.setPower(0.7);
-                    // TODO change powers to 0.8?
+                    outtakeLeft.setPower(params.shooterSetSpeed);
+                    outtakeRight.setPower(params.shooterSetSpeed);
 
                     // reset/start timer
                     timer.reset();
