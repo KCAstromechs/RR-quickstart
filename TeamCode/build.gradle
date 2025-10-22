@@ -18,6 +18,10 @@ apply from: '../build.dependencies.gradle'
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
 
+//    compileSdk 35
+//    defaultConfig {
+//        minSdk 24
+//    }
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
@@ -32,6 +36,7 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
+//    implementation "com.bylazar:"
     implementation "com.acmerobotics.roadrunner:ftc:0.1.25"
     implementation "com.acmerobotics.roadrunner:core:1.0.1"
     implementation "com.acmerobotics.roadrunner:actions:1.0.1"
