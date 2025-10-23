@@ -43,6 +43,7 @@ public class Test extends LinearOpMode {
     private DcMotorEx outtakeRight = null;
 
     private double shooterPercent = .7; // 1.0 = 100%
+    private double minRPM = 80; // originally 95 RPM before 10/22/2025
 
     private double leftTicksPerRev;
     private double rightTicksPerRev;
@@ -163,7 +164,7 @@ public class Test extends LinearOpMode {
             leftRPM = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
             rightRPM = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
             shooting = gamepad2.right_trigger > 0.5;
-            canShoot = (leftRPM > 95 && rightRPM > 95);
+            canShoot = (leftRPM > minRPM && rightRPM > minRPM);
             if (gamepad2.x || gamepad2.a || (shooting && canShoot)) { // if toggled, progression continue
                 progression.setPower(1 * progressionPercent);
             } else if (gamepad2.b) { // if b, progression retract from shooter
@@ -177,6 +178,12 @@ public class Test extends LinearOpMode {
                 shooterPercent -= .05; // -5%
             } else if (gamepad2.dpadUpWasPressed()) {
                 shooterPercent += .05; // +5%
+            }
+            // minRPM buttons
+            if (gamepad2.dpadRightWasPressed()) {
+                minRPM += 5;
+            } else if (gamepad2.dpadLeftWasPressed()) {
+                minRPM -= 5;
             }
 
             // outtake
@@ -242,6 +249,7 @@ public class Test extends LinearOpMode {
             telemetry.addData("Set Power of intake", intake.getPower());
             telemetry.addData("Set Power of progression", progression.getPower());
             telemetry.addData("Shooter Percentage", shooterPercent *100 + " %");
+            telemetry.addData("Minimum RPM", minRPM + " RPM");
             telemetry.addData("RPM of shooterLeft", leftRPM); // (ticksPerSec/ticksPerRev) * 60
             telemetry.addData("RPM of shooterRight", rightRPM ); // (ticksPerSec/ticksPerRev) * 60sd
             telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
