@@ -6,8 +6,11 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Attachments;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+
 @Config
-@Autonomous(name = "AutoFar", group = "Any Side", preselectTeleOp = "Test.java")
+@Autonomous(name = "AutoFar", group = "Any Side", preselectTeleOp = "Test")
 public class AutoFar extends LinearOpMode{
 
     public static class Params {
@@ -16,9 +19,6 @@ public class AutoFar extends LinearOpMode{
         public double initialAngle = Math.toRadians(0);
     }
     public static Params params = new Params();
-
-    // temporary hardwareMap variable
-    HardwareMap hardwareMap;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -54,7 +54,7 @@ public class AutoFar extends LinearOpMode{
         Actions.runBlocking(
                 new SequentialAction(
                         attachments.spinUp(50),
-                        attachments.fireArtifact(5, 50)//,
+                        attachments.fireArtifact(5, 50, 50)//, speed change to 45?
 
                         // add other actions / trajectories
                 )
