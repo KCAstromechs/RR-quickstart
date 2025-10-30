@@ -16,8 +16,8 @@ public class Attachments {
     // INSTANCE VARS
     // Params
     public static class Params {
-        private double shooterSetSpeed = 0.7; // 0.7 = %70
-        // TODO change setSpeed to 0.8? ... testing required
+        private double defaultShooterSpeed = 0.3; // 1.0 = 100%
+        private double defaultMinRPM = 30;
     }
     public static Params params = new Params();
 
@@ -41,13 +41,13 @@ public class Attachments {
     public Attachments(HardwareMap hardwareMap) {
         // initialize shooters
         outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
-        outtakeLeft.setDirection(DcMotorEx.Direction.FORWARD); // TODO change direction if needed
+        outtakeLeft.setDirection(DcMotorEx.Direction.FORWARD); // direction done
         outtakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftTPR = outtakeLeft.getMotorType().getTicksPerRev();
 
         outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
-        outtakeRight.setDirection(DcMotorEx.Direction.FORWARD); // TODO change direction if needed
+        outtakeRight.setDirection(DcMotorEx.Direction.REVERSE); // direction done
         outtakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTPR = outtakeRight.getMotorType().getTicksPerRev();
@@ -72,8 +72,8 @@ public class Attachments {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtakeLeft.setPower(params.shooterSetSpeed);
-                    outtakeRight.setPower(params.shooterSetSpeed);
+                    outtakeLeft.setPower(params.defaultShooterSpeed);
+                    outtakeRight.setPower(params.defaultShooterSpeed);
                     initialized = true;
                 }
                 leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
@@ -101,8 +101,60 @@ public class Attachments {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     // continue outtaking
-                    outtakeLeft.setPower(params.shooterSetSpeed);
-                    outtakeRight.setPower(params.shooterSetSpeed);
+                    outtakeLeft.setPower(params.defaultShooterSpeed);
+                    outtakeRight.setPower(params.defaultShooterSpeed);
+
+                    // reset/start timer
+                    timer.reset();
+                    initialized = true;
+                }
+
+                // constantly update progression & intake
+                leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
+                rightRPM = 60 * (outtakeRight.getVelocity() / rightTPR);
+                canShoot = (leftRPM > targetRPM && rightRPM > targetRPM);
+                if (canShoot) {
+                    progression.setPower(1);
+                    intake.setPower(1);
+                } else {
+                    progression.setPower(0);
+                    intake.setPower(0);
+                }
+
+                double elapsed = timer.seconds();
+                packet.put("Shooting timer", elapsed); // telemetry
+
+                if (elapsed >= durationSeconds) { // check if timer is done
+                    // stop all motors
+                    progression.setPower(0);
+                    intake.setPower(0);
+
+                    outtakeLeft.setPower(0);
+                    outtakeRight.setPower(0);
+
+                    return false; // action finished
+                }
+
+                return true; // keep running until timer reaches target time
+            }
+        };
+    }
+
+    /** Fires one artifact for s seconds
+     *
+     * @param durationSeconds (double) number of seconds you want to continuously shoot
+     * @return returns false after shooter, progression, and intake run for durationSeconds seconds
+     */
+    public Action fireArtifact(double durationSeconds, double targetRPM, double targetSpeed) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    // continue outtaking
+                    outtakeLeft.setPower(targetSpeed);
+                    outtakeRight.setPower(targetSpeed);
 
                     // reset/start timer
                     timer.reset();

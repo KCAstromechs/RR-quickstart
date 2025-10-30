@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Config
-@Autonomous(name = "AutoRedClose", group = "RedSide")
-public class AutoRedClose extends LinearOpMode{
+@Autonomous(name = "AutoBlueClose", group = "RedSide")
+public class AutoBlueClose extends LinearOpMode{
 
     public static class Params {
         public double initialX = 0;
@@ -19,7 +19,7 @@ public class AutoRedClose extends LinearOpMode{
         public double initialAngle = Math.toRadians(0);
 
         public double backwardAmount = 40;
-        public double turnAngle = Math.toRadians(-219);
+        public double turnAmount = Math.toRadians(219);
         public double tgtRPM = 24;
         public double tgtShootSpeed = .23; // 1.0 = 100%
     }
@@ -59,7 +59,7 @@ public class AutoRedClose extends LinearOpMode{
                 .lineToX(params.backwardAmount);
 
         Action endPath = drive.actionBuilder(new Pose2d(params.backwardAmount, 0, Math.toRadians(0)))
-                .turnTo(params.turnAngle)
+                .turnTo(params.turnAmount)
                 .lineToX(params.initialX+5)
                 .build();
 
@@ -68,10 +68,10 @@ public class AutoRedClose extends LinearOpMode{
 
         Actions.runBlocking(
                 new SequentialAction(
-                    moveBackward,
-                    attachments.spinUp(params.tgtRPM),
-                    attachments.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
-                    endPath
+                        moveBackward,
+                        attachments.spinUp(params.tgtRPM),
+                        attachments.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
+                        endPath
                         // add other actions / trajectories
                 )
         );
