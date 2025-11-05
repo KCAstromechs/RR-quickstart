@@ -42,7 +42,9 @@ public class ShooterTest extends LinearOpMode {
                 shooterPercent += .05; // +5%
             }
 
+            telemetry.addData("Keybind for Shooting", "Right Trigger (analog)");
             telemetry.addData("Shooter %", shooterPercent * 100); // note: not rounded at all
+            telemetry.update();
         }
     }
 }
