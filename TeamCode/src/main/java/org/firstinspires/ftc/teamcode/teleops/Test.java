@@ -42,7 +42,7 @@ public class Test extends LinearOpMode {
     private DcMotorEx outtakeLeft = null;
     private DcMotorEx outtakeRight = null;
 
-    private double shooterPercent = .30; // 1.0 = 100%
+    private double shooterPercent = .20; // 1.0 = 100%
     private double minRPM = 30; // originally 95 RPM before 10/22/2025
 
     private double leftTicksPerRev;
