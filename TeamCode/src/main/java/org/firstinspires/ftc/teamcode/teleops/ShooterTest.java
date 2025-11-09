@@ -12,7 +12,7 @@ public class ShooterTest extends LinearOpMode {
     private DcMotorEx shooter;
 
     private double ticksPerRev;
-    private double shooterPercent = 1; // 1.0 = 100%
+    private double shooterPercent = 0.01; // 1.0 = 100%
     private double minRPM;
     private double shooterRPM;
     private boolean shooting;
@@ -33,17 +33,20 @@ public class ShooterTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            shooterRPM = (shooter.getVelocity() / ticksPerRev) * 3600; // 6000
             shooter.setPower(gamepad1.right_trigger * shooterPercent);
 
             // shooter buttons
             if (gamepad1.dpadDownWasPressed()) {
-                shooterPercent -= .05; // -5%
+                shooterPercent -= .01; // -5%
             } else if (gamepad1.dpadUpWasPressed()) {
-                shooterPercent += .05; // +5%
+                shooterPercent += .01; // +5%
             }
 
             telemetry.addData("Keybind for Shooting", "Right Trigger (analog)");
             telemetry.addData("Shooter %", shooterPercent * 100); // note: not rounded at all
+            telemetry.addData("Velocity", shooter.getVelocity());
+            telemetry.addData("RPM", shooterRPM);
             telemetry.update();
         }
     }
