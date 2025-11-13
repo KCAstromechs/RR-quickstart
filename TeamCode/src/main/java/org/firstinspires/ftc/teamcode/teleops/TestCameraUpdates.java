@@ -13,15 +13,21 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.AprilTagWebcam;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 import java.lang.Math;
 
 
-@TeleOp(name="Test", group="Testing")
-public class Test extends LinearOpMode {
+@TeleOp(name="TestCameraUpdates", group="Testing")
+public class TestCameraUpdates extends LinearOpMode {
 
     // Declare OpMode members.
+    // Camera stuff
+    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+
     private ElapsedTime runtime = new ElapsedTime();
 //    private VoltageSensor voltageSensor = null;
 //    vol= hardwareMap.voltageSensor.get("Battery_Voltage_Sensor");
@@ -34,23 +40,23 @@ public class Test extends LinearOpMode {
     private DcMotor backLeft = null;
     private DcMotor frontLeft = null;
 
-    private DcMotor intake = null;
-
-    private DcMotor progression = null;
-    private double progressionPercent = 1.0; // 1.0 = 100%
-
-    private DcMotorEx outtakeLeft = null;
-    private DcMotorEx outtakeRight = null;
-
-    private double shooterPercent = .20; // 1.0 = 100%
-    private double minRPM = 30; // originally 95 RPM before 10/22/2025
-
-    private double leftTicksPerRev;
-    private double rightTicksPerRev;
-    private double leftRPM;
-    private double rightRPM;
-    private boolean shooting = false;
-    private boolean canShoot = false;
+//    private DcMotor intake = null;
+//
+//    private DcMotor progression = null;
+//    private double progressionPercent = 1.0; // 1.0 = 100%
+//
+//    private DcMotorEx outtakeLeft = null;
+//    private DcMotorEx outtakeRight = null;
+//
+//    private double shooterPercent = .20; // 1.0 = 100%
+//    private double minRPM = 30; // originally 95 RPM before 10/22/2025
+//
+//    private double leftTicksPerRev;
+//    private double rightTicksPerRev;
+//    private double leftRPM;
+//    private double rightRPM;
+//    private boolean shooting = false;
+//    private boolean canShoot = false;
 
 //    private boolean in = false;
 //    private boolean progress = false;
@@ -60,13 +66,17 @@ public class Test extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
+        // Camera stuff
+        aprilTagWebcam.init(hardwareMap, telemetry);
+
         // IMU stuff
         YawPitchRollAngles orientation;
         AngularVelocity angularVelocity;
 
-        // CONSTANTS
+        // some vars
         double yawAngle;
         double Speed_percentage;
+        double yawOffset;
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -79,15 +89,15 @@ public class Test extends LinearOpMode {
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
 
-        intake = hardwareMap.get(DcMotor.class, "intake");
-
-        progression = hardwareMap.get(DcMotor.class, "progression");
-
-        outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
-        outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
-
-        leftTicksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
-        rightTicksPerRev = outtakeRight.getMotorType().getTicksPerRev();
+//        intake = hardwareMap.get(DcMotor.class, "intake");
+//
+//        progression = hardwareMap.get(DcMotor.class, "progression");
+//
+//        outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
+//        outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
+//
+//        leftTicksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
+//        rightTicksPerRev = outtakeRight.getMotorType().getTicksPerRev();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -97,9 +107,9 @@ public class Test extends LinearOpMode {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        intake.setDirection(DcMotor.Direction.FORWARD);
-
-        progression.setDirection(DcMotor.Direction.REVERSE);
+//        intake.setDirection(DcMotor.Direction.FORWARD);
+//
+//        progression.setDirection(DcMotor.Direction.REVERSE);
 
         // To allow automatic braking, set 'zero power behavor' to brake for all motors
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -108,13 +118,13 @@ public class Test extends LinearOpMode {
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        outtakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        outtakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        // Speed stuff
-        outtakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        outtakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        outtakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        outtakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+////        // Speed stuff
+//        outtakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        outtakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 //        outtakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        outtakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -145,7 +155,23 @@ public class Test extends LinearOpMode {
             }
             orientation = imu.getRobotYawPitchRollAngles();
 
-            yawAngle = orientation.getYaw(AngleUnit.RADIANS);
+            yawAngle = orientation.getYaw(AngleUnit.DEGREES);
+
+            // Camera stuff
+            // update the vision portal
+            aprilTagWebcam.update();
+            for (AprilTagDetection detection : aprilTagWebcam.getDetectedTags()) {
+                break; // for later
+            }
+            AprilTagDetection idRed = aprilTagWebcam.getTagBySpecificId(20);
+            AprilTagDetection idBlue = aprilTagWebcam.getTagBySpecificId(20);
+            aprilTagWebcam.displayDetectionTelemtry(idRed);
+            aprilTagWebcam.displayDetectionTelemtry(idBlue);
+
+            if (gamepad1.x) {
+                aprilTagWebcam.stop();
+            }
+
 
 //            // intake/progression toggles
 //
@@ -153,42 +179,42 @@ public class Test extends LinearOpMode {
 //                in = !in;
 //            }
 
-            // if driver1 triggers pressed, both on no matter what
-            if ((shooting && canShoot) || gamepad2.x || Math.abs(gamepad1.right_trigger) > 0.5 || Math.abs(gamepad1.left_trigger) > 0.5) { // if toggled, intake in
-                intake.setPower(1);
-            } else {
-                intake.setPower(0);
-            }
-
-            // progression logic
-            leftRPM = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
-            rightRPM = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
-            shooting = gamepad2.right_trigger > 0.5;
-            canShoot = (leftRPM > minRPM && rightRPM > minRPM);
-            if (gamepad2.x || gamepad2.a || (shooting && canShoot)) { // if toggled, progression continue
-                progression.setPower(1 * progressionPercent);
-            } else if (gamepad2.b) { // if b, progression retract from shooter
-                progression.setPower(-1 * progressionPercent);
-            } else {
-                progression.setPower(0);
-            }
-
-            // shooter buttons
-            if (gamepad2.dpadDownWasPressed()) {
-                shooterPercent -= .05; // -5%
-            } else if (gamepad2.dpadUpWasPressed()) {
-                shooterPercent += .05; // +5%
-            }
-            // minRPM buttons
-            if (gamepad2.dpadRightWasPressed()) {
-                minRPM += 5;
-            } else if (gamepad2.dpadLeftWasPressed()) {
-                minRPM -= 5;
-            }
-
-            // outtake
-            outtakeLeft.setPower(gamepad2.right_trigger * shooterPercent);
-            outtakeRight.setPower(-gamepad2.right_trigger * shooterPercent);
+//            // if driver1 triggers pressed, both on no matter what
+//            if ((shooting && canShoot) || gamepad2.x || Math.abs(gamepad1.right_trigger) > 0.5 || Math.abs(gamepad1.left_trigger) > 0.5) { // if toggled, intake in
+//                intake.setPower(1);
+//            } else {
+//                intake.setPower(0);
+//            }
+//
+//            // progression logic
+//            leftRPM = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
+//            rightRPM = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
+//            shooting = gamepad2.right_trigger > 0.5;
+//            canShoot = (leftRPM > minRPM && rightRPM > minRPM);
+//            if (gamepad2.x || gamepad2.a || (shooting && canShoot)) { // if toggled, progression continue
+//                progression.setPower(1 * progressionPercent);
+//            } else if (gamepad2.b) { // if b, progression retract from shooter
+//                progression.setPower(-1 * progressionPercent);
+//            } else {
+//                progression.setPower(0);
+//            }
+//
+//            // shooter buttons
+//            if (gamepad2.dpadDownWasPressed()) {
+//                shooterPercent -= .05; // -5%
+//            } else if (gamepad2.dpadUpWasPressed()) {
+//                shooterPercent += .05; // +5%
+//            }
+//            // minRPM buttons
+//            if (gamepad2.dpadRightWasPressed()) {
+//                minRPM += 5;
+//            } else if (gamepad2.dpadLeftWasPressed()) {
+//                minRPM -= 5;
+//            }
+//
+//            // outtake
+//            outtakeLeft.setPower(gamepad2.right_trigger * shooterPercent);
+//            outtakeRight.setPower(-gamepad2.right_trigger * shooterPercent);
 
             // Ian's shooter thing
              /*if (leftRPM > 95 && rightRPM > 95) {
@@ -202,7 +228,7 @@ public class Test extends LinearOpMode {
             } else {
                 Speed_percentage = 0.6;
             }
-            double theta = yawAngle;
+            double theta = Math.toRadians(yawAngle);
             // PI / 2; = 90 degrees (in terms of radians)
 
             double _inputX = gamepad1.left_stick_x;
@@ -238,7 +264,7 @@ public class Test extends LinearOpMode {
 
             orientation = imu.getRobotYawPitchRollAngles();
             angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-            telemetry.addData("Yaw Angle", JavaUtil.formatNumber(yawAngle, 2));
+            telemetry.addData("Yaw Angle (deg)", JavaUtil.formatNumber(yawAngle, 2));
 
 //            voltage = voltageSensor.getVoltage();
 //            telemetry.addData("Battery Voltage", voltage);
@@ -246,12 +272,12 @@ public class Test extends LinearOpMode {
             // Show the elapsed game time and wheel power.
 //            telemetry.addData("Press A for intake toggle", in);
 //            telemetry.addData("Press B for progression toggle", progress);
-            telemetry.addData("Set Power of intake", intake.getPower());
-            telemetry.addData("Set Power of progression", progression.getPower());
-            telemetry.addData("Shooter Percentage", shooterPercent *100 + " %");
-            telemetry.addData("Minimum RPM", minRPM + " RPM");
-            telemetry.addData("RPM of shooterLeft", leftRPM); // (ticksPerSec/ticksPerRev) * 60
-            telemetry.addData("RPM of shooterRight", rightRPM ); // (ticksPerSec/ticksPerRev) * 60sd
+//            telemetry.addData("Set Power of intake", intake.getPower());
+//            telemetry.addData("Set Power of progression", progression.getPower());
+//            telemetry.addData("Shooter Percentage", shooterPercent *100 + " %");
+//            telemetry.addData("Minimum RPM", minRPM + " RPM");
+//            telemetry.addData("RPM of shooterLeft", leftRPM); // (ticksPerSec/ticksPerRev) * 60
+//            telemetry.addData("RPM of shooterRight", rightRPM ); // (ticksPerSec/ticksPerRev) * 60sd
             telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
