@@ -155,6 +155,7 @@ public class AutoAimTesting extends OpMode {
         AprilTagDetection idBlue = aprilTagWebcam.getTagBySpecificId(20);
         aprilTagWebcam.displayDetectionTelemtry(idRed);
         aprilTagWebcam.displayDetectionTelemtry(idBlue);
+//        aprilTagWebcam.stop();
 
         // auto aim
         /*
@@ -163,56 +164,59 @@ public class AutoAimTesting extends OpMode {
         else (if no tags detected, add "no tags detected" to telemetry)
         (for all cases, add a multiplier to the turning speed based on how far off center the tag is)
          */
-        if (idRed != null) {
-            double angleOfDeflection = idRed.xAngleToTag;
-            // double angleOfDeflection = idRed.ftcPose.bearing;
-            telemetry.addData("Red Angle of Deflection", angleOfDeflection);
-            if (angleOfDeflection > angleOfDeflectionTolerance) {
-            turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
-            backRight.setPower(-Speed_percentage * turnMultiplier);
-            backLeft.setPower(Speed_percentage * turnMultiplier);
-            frontRight.setPower(-Speed_percentage * turnMultiplier);
-            frontLeft.setPower(Speed_percentage * turnMultiplier);
-            } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
-            turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
-            backRight.setPower(Speed_percentage * turnMultiplier);
-            backLeft.setPower(-Speed_percentage * turnMultiplier);
-            frontRight.setPower(Speed_percentage * turnMultiplier);
-            frontLeft.setPower(-Speed_percentage * turnMultiplier);
+        if (gamepad1.a) {
+            if (idRed != null) {
+                //            double angleOfDeflection = idRed.xAngleToTag;
+                double angleOfDeflection = idRed.ftcPose.bearing;
+                telemetry.addData("Red Angle of Deflection", angleOfDeflection);
+                double turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
+                if (angleOfDeflection > angleOfDeflectionTolerance) {
+                    //          turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
+                    backRight.setPower(-Speed_percentage * turnMultiplier);
+                    backLeft.setPower(Speed_percentage * turnMultiplier);
+                    frontRight.setPower(-Speed_percentage * turnMultiplier);
+                    frontLeft.setPower(Speed_percentage * turnMultiplier);
+                } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                    //                  turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
+                    backRight.setPower(Speed_percentage * turnMultiplier);
+                    backLeft.setPower(-Speed_percentage * turnMultiplier);
+                    frontRight.setPower(Speed_percentage * turnMultiplier);
+                    frontLeft.setPower(-Speed_percentage * turnMultiplier);
+                } else {
+                    // stop turning
+                    backRight.setPower(0);
+                    backLeft.setPower(0);
+                    frontRight.setPower(0);
+                    frontLeft.setPower(0);
+                }
+            } else if (idBlue != null) {
+                //            double angleOfDeflection = idBlue.xAngleToTag;
+                double angleOfDeflection = idBlue.ftcPose.bearing;
+                telemetry.addData("Blue Angle of Deflection", angleOfDeflection);
+                turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
+                if (angleOfDeflection > angleOfDeflectionTolerance) {
+                    //                turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
+                    backRight.setPower(-Speed_percentage * turnMultiplier);
+                    backLeft.setPower(Speed_percentage * turnMultiplier);
+                    frontRight.setPower(-Speed_percentage * turnMultiplier);
+                    frontLeft.setPower(Speed_percentage * turnMultiplier);
+                } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                    //                turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
+                    backRight.setPower(Speed_percentage * turnMultiplier);
+                    backLeft.setPower(-Speed_percentage * turnMultiplier);
+                    frontRight.setPower(Speed_percentage * turnMultiplier);
+                    frontLeft.setPower(-Speed_percentage * turnMultiplier);
+                } else {
+                    // stop turning
+                    backRight.setPower(0);
+                    backLeft.setPower(0);
+                    frontRight.setPower(0);
+                    frontLeft.setPower(0);
+                }
             } else {
-            // stop turning
-            backRight.setPower(0);
-            backLeft.setPower(0);
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
+                telemetry.addData("Tag Detection", "No Tags Detected");
             }
-        } else if (idBlue != null) {
-            double angleOfDeflection = idBlue.xAngleToTag;
-            // double angleOfDeflection = idBlue.ftcPose.bearing;
-            telemetry.addData("Blue Angle of Deflection", angleOfDeflection);
-            if (angleOfDeflection > angleOfDeflectionTolerance) {
-            turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
-            backRight.setPower(-Speed_percentage * turnMultiplier);
-            backLeft.setPower(Speed_percentage * turnMultiplier);
-            frontRight.setPower(-Speed_percentage * turnMultiplier);
-            frontLeft.setPower(Speed_percentage * turnMultiplier);
-            } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
-            turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
-            backRight.setPower(Speed_percentage * turnMultiplier);
-            backLeft.setPower(-Speed_percentage * turnMultiplier);
-            frontRight.setPower(Speed_percentage * turnMultiplier);
-            frontLeft.setPower(-Speed_percentage * turnMultiplier);
-            } else {
-                // stop turning
-                backRight.setPower(0);
-                backLeft.setPower(0);
-                frontRight.setPower(0);
-                frontLeft.setPower(0);
-            }
-        } else {
-            telemetry.addData("Tag Detection", "No Tags Detected");
         }
-        
 
         orientation = imu.getRobotYawPitchRollAngles();
         angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);

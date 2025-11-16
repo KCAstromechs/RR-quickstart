@@ -13,6 +13,9 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.AprilTagWebcam;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 import java.lang.Math;
@@ -25,6 +28,11 @@ public class Test extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 //    private VoltageSensor voltageSensor = null;
 //    vol= hardwareMap.voltageSensor.get("Battery_Voltage_Sensor");
+
+    private AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private double turnMultiplier = 0;
+    private final double turnMultiplierMax = 2;
+    private double angleOfDeflectionTolerance = 2;
 
     // IMU
     private IMU imu;
@@ -60,6 +68,8 @@ public class Test extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
+        aprilTagWebcam.init(hardwareMap, telemetry);
+
         // IMU stuff
         YawPitchRollAngles orientation;
         AngularVelocity angularVelocity;
@@ -71,20 +81,20 @@ public class Test extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        frontRight  = hardwareMap.get(DcMotor.class, "rightFront");
-        backRight = hardwareMap.get(DcMotor.class, "rightBack");
-        backLeft = hardwareMap.get(DcMotor.class, "leftBack");
-        frontLeft = hardwareMap.get(DcMotor.class, "leftFront");
+        frontRight  = hardwareMap.get(DcMotor.class, "rightFront"); //
+        backRight = hardwareMap.get(DcMotor.class, "rightBack"); //
+        backLeft = hardwareMap.get(DcMotor.class, "leftBack"); //
+        frontLeft = hardwareMap.get(DcMotor.class, "leftFront"); //
 
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
 
-        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake = hardwareMap.get(DcMotor.class, "intake"); // port 0 exp. hub
 
-        progression = hardwareMap.get(DcMotor.class, "progression");
+        progression = hardwareMap.get(DcMotor.class, "progression"); // port 3 exp. hub
 
-        outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
-        outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
+        outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft"); // port 2 exp. hub
+        outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight"); // port 1 exp. hub
 
         leftTicksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
         rightTicksPerRev = outtakeRight.getMotorType().getTicksPerRev();
@@ -236,8 +246,76 @@ public class Test extends LinearOpMode {
             frontLeft.setPower((leftFrontPower));
             // Get the orientation and angular velocity.
 
-            orientation = imu.getRobotYawPitchRollAngles();
-            angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
+            // update the vison portal
+            aprilTagWebcam.update();
+            AprilTagDetection idRed = aprilTagWebcam.getTagBySpecificId(24);
+            AprilTagDetection idBlue = aprilTagWebcam.getTagBySpecificId(20);
+            aprilTagWebcam.displayDetectionTelemtry(idRed);
+            aprilTagWebcam.displayDetectionTelemtry(idBlue);
+//        aprilTagWebcam.stop();
+
+            // auto aim
+        /*
+        if b (angle of deflection) > 0, turn left (slowly)
+        else if b (angle of deflection < 0, turn right (slowly)
+        else (if no tags detected, add "no tags detected" to telemetry)
+        (for all cases, add a multiplier to the turning speed based on how far off center the tag is)
+         */
+            if (gamepad1.a) {
+                if (idRed != null) {
+                    //            double angleOfDeflection = idRed.xAngleToTag;
+                    double angleOfDeflection = idRed.ftcPose.bearing;
+                    telemetry.addData("Red Angle of Deflection", angleOfDeflection);
+                    double turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
+                    if (angleOfDeflection > angleOfDeflectionTolerance) {
+                        //          turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
+                        backRight.setPower(-Speed_percentage * turnMultiplier);
+                        backLeft.setPower(Speed_percentage * turnMultiplier);
+                        frontRight.setPower(-Speed_percentage * turnMultiplier);
+                        frontLeft.setPower(Speed_percentage * turnMultiplier);
+                    } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                        //                  turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
+                        backRight.setPower(Speed_percentage * turnMultiplier);
+                        backLeft.setPower(-Speed_percentage * turnMultiplier);
+                        frontRight.setPower(Speed_percentage * turnMultiplier);
+                        frontLeft.setPower(-Speed_percentage * turnMultiplier);
+                    } else {
+                        // stop turning
+                        backRight.setPower(0);
+                        backLeft.setPower(0);
+                        frontRight.setPower(0);
+                        frontLeft.setPower(0);
+                    }
+                } else if (idBlue != null) {
+                    //            double angleOfDeflection = idBlue.xAngleToTag;
+                    double angleOfDeflection = idBlue.ftcPose.bearing;
+                    telemetry.addData("Blue Angle of Deflection", angleOfDeflection);
+                    turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
+                    if (angleOfDeflection > angleOfDeflectionTolerance) {
+                        //                turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
+                        backRight.setPower(-Speed_percentage * turnMultiplier);
+                        backLeft.setPower(Speed_percentage * turnMultiplier);
+                        frontRight.setPower(-Speed_percentage * turnMultiplier);
+                        frontLeft.setPower(Speed_percentage * turnMultiplier);
+                    } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                        //                turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
+                        backRight.setPower(Speed_percentage * turnMultiplier);
+                        backLeft.setPower(-Speed_percentage * turnMultiplier);
+                        frontRight.setPower(Speed_percentage * turnMultiplier);
+                        frontLeft.setPower(-Speed_percentage * turnMultiplier);
+                    } else {
+                        // stop turning
+                        backRight.setPower(0);
+                        backLeft.setPower(0);
+                        frontRight.setPower(0);
+                        frontLeft.setPower(0);
+                    }
+                } else {
+                    telemetry.addData("Tag Detection", "No Tags Detected");
+                }
+            }
+//            orientation = imu.getRobotYawPitchRollAngles();
+//            angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
             telemetry.addData("Yaw Angle", JavaUtil.formatNumber(yawAngle, 2));
 
 //            voltage = voltageSensor.getVoltage();
