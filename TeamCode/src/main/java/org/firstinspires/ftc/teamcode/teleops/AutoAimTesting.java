@@ -19,6 +19,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "AutoAimTesting", group = "Testing")
 public class AutoAimTesting extends OpMode {
@@ -93,6 +94,7 @@ public class AutoAimTesting extends OpMode {
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
         // Prompt user to press start button.
         telemetry.addData("Initialization finished", "Press start to continue...");
+//        telemetry.addData("exposure (i think plz idk man)", aprilTagWebcam.getExposureControl().getExposure(TimeUnit.MILLISECONDS));
         telemetry.update();
     }
 

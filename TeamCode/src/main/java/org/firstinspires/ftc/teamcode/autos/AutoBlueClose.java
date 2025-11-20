@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autos;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -21,10 +23,10 @@ public class AutoBlueClose extends LinearOpMode{
         public double initialY = 0;
         public double initialAngle = Math.toRadians(0);
 
-        public double backwardAmount = 40;
+        public double backwardAmount = 50;
         public double turnAmount = Math.toRadians(219);
-        public double tgtRPM = 24;
-        public double tgtShootSpeed = .23; // 1.0 = 100%
+        public double tgtRPM = 30;
+        public double tgtShootSpeed = .2; // 1.0 = 100%
     }
     public static Params params = new Params();
 
@@ -58,7 +60,7 @@ public class AutoBlueClose extends LinearOpMode{
         if (isStopRequested()) return;
 
         // change trajectory if needed here with if statements
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+        TrajectoryActionBuilder ScootBackFirst = drive.actionBuilder(initialPose)
                 .lineToX(params.backwardAmount);
 
         Action endPath = drive.actionBuilder(new Pose2d(params.backwardAmount, 0, Math.toRadians(0)))
@@ -67,7 +69,7 @@ public class AutoBlueClose extends LinearOpMode{
                 .build();
 
         Action moveBackward;
-        moveBackward = tab1.build();
+        moveBackward = ScootBackFirst.build();
 
         Actions.runBlocking(
                 new SequentialAction(
@@ -78,5 +80,12 @@ public class AutoBlueClose extends LinearOpMode{
                         // add other actions / trajectories
                 )
         );
+    }
+
+    @NonNull
+    public static Action turnLeft(double degrees, MecanumDrive drive) {
+        return drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+                .turnTo(Math.toRadians(degrees))
+                .build();
     }
 }

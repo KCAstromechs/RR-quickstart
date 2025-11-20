@@ -23,8 +23,8 @@ public class AutoRedClose extends LinearOpMode{
 
         public double backwardAmount = 40;
         public double turnAngle = Math.toRadians(-219);
-        public double tgtRPM = 24;
-        public double tgtShootSpeed = .23; // 1.0 = 100%
+        public double tgtRPM = 30;
+        public double tgtShootSpeed = .2; // 1.0 = 100%
     }
     public static Params params = new Params();
 

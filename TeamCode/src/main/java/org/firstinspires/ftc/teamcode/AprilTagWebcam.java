@@ -2,21 +2,28 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
+import com.google.blocks.ftcrobotcontroller.runtime.obsolete.VuforiaLocalizerAccess;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.UtilityOctoQuadConfigMenu;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+//import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer; // DOESN'T exist D:
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AprilTagWebcam {
+
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
 
@@ -24,8 +31,11 @@ public class AprilTagWebcam {
 
     private Telemetry telemetry;
 
+    private ExposureControl exposureControl;
+
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
+
 
         // Create/declare/assign aprilTagProcessor
         aprilTagProcessor = new AprilTagProcessor.Builder()
@@ -38,12 +48,22 @@ public class AprilTagWebcam {
 
         // Create/declare/assign visionPortal
         VisionPortal.Builder builder = new VisionPortal.Builder();
+
+//        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+//        webcamName.
+//        Camera camera = hardwareMap.get(Camera.class, "Webcam 1");
+//        exposureControl = camera.getControl(ExposureControl.class);
+
         builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         builder.setCameraResolution(new Size(640, 480));
         builder.addProcessor(aprilTagProcessor);
 
         visionPortal = builder.build();
+//        exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+//
 
+//        telemetry.addData("exposure (i think plz idk man)", exposureControl.getExposure(TimeUnit.MILLISECONDS));
+//        telemetry.update();
     }
 
     public void update() {
@@ -53,6 +73,10 @@ public class AprilTagWebcam {
     public List<AprilTagDetection> getDetectedTags() {
         return detectedTags;
     }
+
+//    public ExposureControl getExposureControl() {
+//        return exposureControl;
+//    }
 
     public void displayDetectionTelemtry(AprilTagDetection detectedTag) {
         if (detectedTag == null) {return;}
