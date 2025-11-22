@@ -24,7 +24,7 @@ public class AutoBlueClose extends LinearOpMode{
         public double initialAngle = Math.toRadians(0);
 
         public double backwardAmount = 50;
-        public double turnAmount = Math.toRadians(219);
+        public double turnAngle = Math.toRadians(219);
         public double tgtRPM = 30;
         public double tgtShootSpeed = .2; // 1.0 = 100%
     }
@@ -64,7 +64,7 @@ public class AutoBlueClose extends LinearOpMode{
                 .lineToX(params.backwardAmount);
 
         Action endPath = drive.actionBuilder(new Pose2d(params.backwardAmount, 0, Math.toRadians(0)))
-                .turnTo(params.turnAmount)
+                .turnTo(params.turnAngle)
                 .lineToX(params.initialX+5)
                 .build();
 
