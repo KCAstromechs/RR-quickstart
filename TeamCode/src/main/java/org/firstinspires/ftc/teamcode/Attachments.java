@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Config
 public class Attachments {
     // INSTANCE VARS
@@ -37,6 +39,8 @@ public class Attachments {
     // timer
     private ElapsedTime timer = new ElapsedTime();
 
+    private ElapsedTime runTimer = new ElapsedTime();
+
     // THE ONLY CONSTRUCTOR
     public Attachments(HardwareMap hardwareMap) {
         // initialize shooters
@@ -58,6 +62,25 @@ public class Attachments {
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotorEx.Direction.FORWARD);
+    }
+
+    public Action displayRunTime(Telemetry telemetry) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    runTimer.reset();
+                    initialized = true;
+                }
+                // stuff
+
+                telemetry.addData("Run Time", runTimer.seconds());
+                telemetry.update();
+                return true; // don't stop until stop button pressed
+            }
+        };
     }
 
     /** Spins up shooter motors and ends once motors reach targetRPM
