@@ -18,6 +18,9 @@ public class AutoFar extends LinearOpMode{
         public double initialX = 0;
         public double initialY = 0;
         public double initialAngle = Math.toRadians(0);
+
+        public double turnAimAngle = 10;
+        public double backwardAmount = 20;
     }
     public static Params params = new Params();
 
@@ -52,11 +55,17 @@ public class AutoFar extends LinearOpMode{
 
         // change trajectory if needed here with if statements
         Action moveForward = drive.actionBuilder(initialPose)
+                .lineToX(-params.backwardAmount)
+                .build();
+
+        Action leaveWall = drive.actionBuilder(initialPose)
                 .lineToX(-10)
+                .turnTo(Math.toRadians(params.turnAimAngle))
                 .build();
 
         Actions.runBlocking(
                 new SequentialAction(
+//                        leaveWall,
                         attachments.spinUp(50),
                         attachments.fireArtifact(5, 50, 50),//, speed change to 45?
                         moveForward
