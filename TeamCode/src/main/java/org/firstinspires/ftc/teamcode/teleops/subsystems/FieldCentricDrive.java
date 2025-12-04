@@ -57,6 +57,7 @@ public class FieldCentricDrive {
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        boostState = BoostState.NORMAL;
         speedPercentage = speeds.normalSpeed;
         yawAngle = 0;
 
@@ -66,7 +67,6 @@ public class FieldCentricDrive {
         // the REV Robotics logo is facing and the direction that the USB ports are facing.
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
         // TODO edit the orientation of IMU
-
     }
 
     public void updateYaw() {
@@ -86,9 +86,19 @@ public class FieldCentricDrive {
         switch (boostState) {
             case BOOSTING:
                 speedPercentage = speeds.boostSpeed;
+                break;
             case NORMAL:
                 speedPercentage = speeds.normalSpeed;
+                break;
         }
+    }
+
+    public void boost() {
+        boostState = BoostState.BOOSTING;
+    }
+
+    public void normal() {
+        boostState = BoostState.NORMAL;
     }
 
     public void drive(double moveX, double moveY, double rotX) {

@@ -12,12 +12,19 @@ public class Intake {
         public double IN = 1.0;
         public double OUT = -1.0; // currently half
         public double OFF = 0.0;
-
     }
 
     public static Speeds speeds = new Speeds();
 
     private DcMotor intake;
+
+    private enum IntakeState {
+        INTAKING,
+        OUTTAKING,
+        OFF
+    }
+
+    private IntakeState intakeState;
 
     public void init(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotor.class, "intake");
@@ -28,15 +35,39 @@ public class Intake {
         intake.setDirection(DcMotor.Direction.FORWARD);
 
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeState = IntakeState.OFF;
+    }
+
+    public void updateIntake() {
+        // could add state machine logic here if needed
+        switch (intakeState) {
+            case INTAKING:
+                
+                intake.setPower(speeds.IN);
+                break;
+
+            case OUTTAKING:
+                
+                intake.setPower(speeds.OUT);
+                break;
+
+            case OFF:
+                
+                intake.setPower(speeds.OFF);
+                break;
+        
+            default:
+                break;
+        }
     }
 
     public void intake() {
-        intake.setPower(speeds.IN);
+        intakeState = IntakeState.INTAKING;
     }
     public void outtake() {
-        intake.setPower(speeds.OUT);
+        intakeState = IntakeState.OUTTAKING;
     }
     public void stop() {
-        intake.setPower(speeds.OFF);
+        intakeState = IntakeState.OFF;
     }
 }
