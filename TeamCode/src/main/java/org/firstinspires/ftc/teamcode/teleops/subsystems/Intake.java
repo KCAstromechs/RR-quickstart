@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.UtilityOctoQuadConfigMenu;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
@@ -44,20 +43,20 @@ public class Intake {
         // could add state machine logic here if needed
         switch (intakeState) {
             case INTAKING:
-                
+
                 intake.setPower(speeds.IN);
                 break;
 
             case OUTTAKING:
-                
+
                 intake.setPower(speeds.OUT);
                 break;
 
             case OFF:
-                
+
                 intake.setPower(speeds.OFF);
                 break;
-        
+
             default:
                 break;
         }

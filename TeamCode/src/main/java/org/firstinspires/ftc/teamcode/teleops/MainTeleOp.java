@@ -8,21 +8,22 @@ import org.firstinspires.ftc.teamcode.teleops.subsystems.Spindexer;
 
 // other other imports
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@TeleOp(name = "MainTeleOp", group = "Comp")
 public class MainTeleOp extends OpMode {
 
     private FieldCentricDrive drive = new FieldCentricDrive();
     private Intake intake = new Intake();
-    // TODO create Launcher and probably indexer subsystems
     private Launcher launcher = new Launcher();
-    private Spindexer spindexer = new Spindexer();
+    private Spindexer spindexer = new Spindexer(); // TODO finish spindexer subsystem
 
     @Override
     public void init() {
-        
+
         drive.init(hardwareMap);
         intake.init(hardwareMap);
-//        launcher.init(hardwareMap);
+        launcher.init(hardwareMap);
 //        spindexer.init(hardwareMap);
 
     }
@@ -40,9 +41,14 @@ public class MainTeleOp extends OpMode {
             intake.stop();
         }
 
-        // launcher
+        // TODO launcher
+        if (Math.abs(gamepad2.left_trigger) > 0.25 || Math.abs(gamepad2.right_trigger) > 0.25) {
+            launcher.startLauncher();
+        } else if (gamepad2.b) {
+            launcher.stopLauncher();
+        }
 
-        // spindexer ? - may not need keybinds, just an update method with more params
+        // TODO spindexer ? - may not need keybinds, just an update method with more params
 
         // Drive Keybinds
         drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // movement
@@ -56,6 +62,9 @@ public class MainTeleOp extends OpMode {
         // update subsystems
         drive.updateDrive();
         intake.updateIntake();
+        launcher.updateLauncher();
+//        spindexer.updateSpindexer();
+
 
         // show telemetry
         intake.displayTelemetry(telemetry);
