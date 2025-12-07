@@ -26,6 +26,13 @@ public class FieldCentricDrive {
     private YawPitchRollAngles orientation;
 
     private DcMotor frontRight, frontLeft, backRight, backLeft;
+    /*
+    Ports:
+    - FR: 2
+    - FL: 0
+    - BR: 3
+    - BL: 1
+     */
 
     private double speedPercentage, yawAngle;
 
@@ -137,13 +144,16 @@ public class FieldCentricDrive {
         backLeft.setPower((leftBackPower));
     }
 
-    // TODO add telemetry methods
+    public String getState() {
+        return boostState.toString();
+    }
+
     public void displayTelemetry(Telemetry telemetry) {
         telemetry.addLine("Drive Telemetry:");
         telemetry.addLine("Motor Powers (F = front, B = back)");
         telemetry.addData("F Motors", "left (%.2f), right (%.2f)", frontLeft.getPower(), frontRight.getPower());
         telemetry.addData("B Motors", "left (%.2f), right (%.2f)", backLeft.getPower(), backRight.getPower());
         telemetry.addLine("Other");
-        telemetry.addData("Boost State", boostState);
+        telemetry.addData("Boost State", getState());
     }
 }

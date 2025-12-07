@@ -73,8 +73,12 @@ public class Intake {
         if (intakeState != IntakeState.OFF) intakeState = IntakeState.OFF;
     }
 
+    public String getState() {
+        return intakeState.toString();
+    }
+
     public void displayTelemetry(Telemetry telemetry) {
         telemetry.addLine("Intake Telemetry:");
-        telemetry.addData("Intake State", intakeState);
+        telemetry.addData("Intake State", getState());
     }
 }
