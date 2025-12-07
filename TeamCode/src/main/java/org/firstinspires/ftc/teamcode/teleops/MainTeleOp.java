@@ -1,30 +1,64 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
-// import org.firstinspires.ftc.teamcode.teleops.subsystems.Intake;
-// import org.firstinspires.ftc.teamcode.teleops.subsystems.FieldCentricDrive;
+// the homemade subsystems
+import org.firstinspires.ftc.teamcode.teleops.subsystems.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.teleops.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.teleops.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.teleops.subsystems.Spindexer;
+
+// other other imports
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class MainTeleOp extends OpMode {
 
     private FieldCentricDrive drive = new FieldCentricDrive();
     private Intake intake = new Intake();
+    // TODO create Launcher and probably indexer subsystems
+    private Launcher launcher = new Launcher();
+    private Spindexer spindexer = new Spindexer();
 
     @Override
     public void init() {
         
         drive.init(hardwareMap);
         intake.init(hardwareMap);
-
+//        launcher.init(hardwareMap);
+//        spindexer.init(hardwareMap);
 
     }
 
     @Override
     public void loop() {
 
+        // Attachment Keybinds
+        // intake
+        if (Math.abs(gamepad1.right_trigger) > .25 || Math.abs(gamepad1.left_trigger) > .25) {
+            intake.intake();
+        } else if (gamepad1.dpad_down) {
+            intake.outtake();
+        } else {
+            intake.stop();
+        }
 
+        // launcher
+
+        // spindexer ? - may not need keybinds, just an update method with more params
+
+        // Drive Keybinds
+        drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // movement
+        // boost
+        if (gamepad1.right_bumper || gamepad1.left_bumper) {
+            drive.boost();
+        } else {
+            drive.normal();
+        }
 
         // update subsystems
         drive.updateDrive();
         intake.updateIntake();
+
+        // show telemetry
+        intake.displayTelemetry(telemetry);
+        drive.displayTelemetry(telemetry);
     }
 }

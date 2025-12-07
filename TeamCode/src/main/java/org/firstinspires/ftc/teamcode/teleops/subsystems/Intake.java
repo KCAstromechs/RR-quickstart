@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.teleops.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.UtilityOctoQuadConfigMenu;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class Intake {
@@ -62,12 +64,17 @@ public class Intake {
     }
 
     public void intake() {
-        intakeState = IntakeState.INTAKING;
+        if (intakeState != IntakeState.INTAKING) intakeState = IntakeState.INTAKING;
     }
     public void outtake() {
-        intakeState = IntakeState.OUTTAKING;
+        if (intakeState != IntakeState.OUTTAKING) intakeState = IntakeState.OUTTAKING;
     }
     public void stop() {
-        intakeState = IntakeState.OFF;
+        if (intakeState != IntakeState.OFF) intakeState = IntakeState.OFF;
+    }
+
+    public void displayTelemetry(Telemetry telemetry) {
+        telemetry.addLine("Intake Telemetry:");
+        telemetry.addData("Intake State", intakeState);
     }
 }

@@ -5,11 +5,10 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-
-
-
 
 @Config
 public class FieldCentricDrive {
@@ -78,6 +77,11 @@ public class FieldCentricDrive {
         imu.resetYaw();
     }
 
+    /**
+     * Updates the drive subsystem
+     *  - Updates yaw / rotation
+     *  - updates boost state
+     */
     public void updateDrive() {
         // update yaw
         updateYaw();
@@ -94,11 +98,11 @@ public class FieldCentricDrive {
     }
 
     public void boost() {
-        boostState = BoostState.BOOSTING;
+        if (boostState == BoostState.NORMAL) boostState = BoostState.BOOSTING;
     }
 
     public void normal() {
-        boostState = BoostState.NORMAL;
+        if (boostState == BoostState.BOOSTING) boostState = BoostState.NORMAL;
     }
 
     public void drive(double moveX, double moveY, double rotX) {
@@ -134,4 +138,12 @@ public class FieldCentricDrive {
     }
 
     // TODO add telemetry methods
+    public void displayTelemetry(Telemetry telemetry) {
+        telemetry.addLine("Drive Telemetry:");
+        telemetry.addLine("Motor Powers (F = front, B = back)");
+        telemetry.addData("F Motors", "left (%.2f), right (%.2f)", frontLeft.getPower(), frontRight.getPower());
+        telemetry.addData("B Motors", "left (%.2f), right (%.2f)", backLeft.getPower(), backRight.getPower());
+        telemetry.addLine("Other");
+        telemetry.addData("Boost State", boostState);
+    }
 }
