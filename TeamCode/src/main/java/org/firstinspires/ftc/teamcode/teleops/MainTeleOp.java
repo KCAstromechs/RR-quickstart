@@ -23,7 +23,7 @@ public class MainTeleOp extends OpMode {
 
         drive.init(hardwareMap);
         intake.init(hardwareMap);
-        launcher.init(hardwareMap);
+//        launcher.init(hardwareMap);
 //        spindexer.init(hardwareMap);
 
     }
@@ -42,11 +42,11 @@ public class MainTeleOp extends OpMode {
         }
 
         // TODO launcher
-        if (Math.abs(gamepad2.left_trigger) > 0.25 || Math.abs(gamepad2.right_trigger) > 0.25) {
-            launcher.startLauncher();
-        } else if (gamepad2.b) {
-            launcher.stopLauncher();
-        }
+//        if (Math.abs(gamepad2.left_trigger) > 0.25 || Math.abs(gamepad2.right_trigger) > 0.25) {
+//            launcher.startLauncher();
+//        } else if (gamepad2.b) {
+//            launcher.stopLauncher();
+//        }
 
         // TODO spindexer ? - may not need keybinds, just an update method with more params
 
@@ -62,7 +62,7 @@ public class MainTeleOp extends OpMode {
         // update subsystems
         drive.updateDrive();
         intake.updateIntake();
-        launcher.updateLauncher();
+//        launcher.updateLauncher();
 //        spindexer.updateSpindexer();
 
 
