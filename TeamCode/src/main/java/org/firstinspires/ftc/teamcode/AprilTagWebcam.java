@@ -50,7 +50,7 @@ public class AprilTagWebcam {
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
 //        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-//        webcamName.
+//        webcamName.getCameraCharacteristics()
 //        Camera camera = hardwareMap.get(Camera.class, "Webcam 1");
 //        exposureControl = camera.getControl(ExposureControl.class);
 
@@ -60,10 +60,11 @@ public class AprilTagWebcam {
 
         visionPortal = builder.build();
 //        exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-//
+
+//        exposureControl.getExposure(TimeUnit.MILLISECONDS);
 
 //        telemetry.addData("exposure (i think plz idk man)", exposureControl.getExposure(TimeUnit.MILLISECONDS));
-//        telemetry.update();
+        telemetry.update();
     }
 
     public void update() {
@@ -105,4 +106,12 @@ public class AprilTagWebcam {
             visionPortal.close();
         }
     }
+
+    public VisionPortal getVisionPortal() {
+        return visionPortal;
+    }
+
+//    public double getExposure() {
+//        return exposureControl.getExposure(TimeUnit.MILLISECONDS);
+//    }
 }

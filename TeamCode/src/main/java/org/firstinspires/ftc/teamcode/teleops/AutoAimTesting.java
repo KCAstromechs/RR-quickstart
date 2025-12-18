@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.max;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -8,15 +9,19 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +50,16 @@ public class AutoAimTesting extends OpMode {
     private double turnMultiplier = 0;
     private final double turnMultiplierMax = 2;
     private double angleOfDeflectionTolerance = 2;
+
+    private ExposureControl exposureControl;
+    private float myExposure ;
+    private long    minExposure ;
+    private long    maxExposure ;
+
+    boolean thisExpUp = false;
+    boolean thisExpDn = false;
+    boolean lastExpUp = false;
+    boolean lastExpDn = false;
 
     @Override
     public void init() {
@@ -83,6 +98,18 @@ public class AutoAimTesting extends OpMode {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+//        exposureControl = aprilTagWebcam.getVisionPortal().getCameraControl(ExposureControl.class);
+        while (aprilTagWebcam.getVisionPortal().getCameraState() != VisionPortal.CameraState.STREAMING){
+            // do nothing
+            telemetry.addData("Camera State", "NOT READY");
+            telemetry.update();
+        }
+        exposureControl = aprilTagWebcam.getVisionPortal().getCameraControl(ExposureControl.class);
+        exposureControl.setMode(ExposureControl.Mode.Manual);
+        exposureControl.setExposure(20, TimeUnit.MILLISECONDS);
+        minExposure = exposureControl.getMinExposure(TimeUnit.MILLISECONDS);
+        maxExposure = exposureControl.getMaxExposure(TimeUnit.MILLISECONDS);
+
         Speed_percentage = 0.6;
         yawAngle = 0;
         // Initialize the IMU.
@@ -95,6 +122,31 @@ public class AutoAimTesting extends OpMode {
         // Prompt user to press start button.
         telemetry.addData("Initialization finished", "Press start to continue...");
 //        telemetry.addData("exposure (i think plz idk man)", aprilTagWebcam.getExposureControl().getExposure(TimeUnit.MILLISECONDS));
+        telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+        // add exposure changing
+
+        thisExpUp = gamepad1.left_bumper;
+        thisExpDn = gamepad1.left_trigger > 0.25;
+
+
+        // look for clicks to change exposure
+        if (thisExpUp && !lastExpUp) {
+            myExposure = Range.clip(myExposure + 1, minExposure, maxExposure);
+            long tempExposure = (long) myExposure;
+            exposureControl.setExposure(tempExposure, TimeUnit.MILLISECONDS);
+        } else if (thisExpDn && !lastExpDn) {
+            myExposure = Range.clip(myExposure - 1, minExposure, maxExposure);
+            long tempExposure = (long) myExposure;
+            exposureControl.setExposure(tempExposure, TimeUnit.MILLISECONDS);
+        }
+        lastExpUp = thisExpUp;
+        lastExpDn = thisExpDn;
+
+        telemetry.addData("Exposure", exposureControl.getExposure(TimeUnit.MILLISECONDS));
         telemetry.update();
     }
 
@@ -224,6 +276,8 @@ public class AutoAimTesting extends OpMode {
         angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
         telemetry.addData("Yaw Angle", JavaUtil.formatNumber(yawAngle, 2));
         telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
+        telemetry.addData("Exposure of camera", exposureControl.getExposure(TimeUnit.MILLISECONDS));
+        telemetry.addData("Exposure Mode", exposureControl.getMode().toString());
         telemetry.update();
     }
 }

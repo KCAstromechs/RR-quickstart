@@ -10,15 +10,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.AprilTagWebcam;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 import java.lang.Math;
+import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name="Test", group="Testing")
@@ -30,6 +33,8 @@ public class Test extends LinearOpMode {
 //    vol= hardwareMap.voltageSensor.get("Battery_Voltage_Sensor");
 
     private AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private ExposureControl exposureControl;
+    private long defaultExposure = 2; // in TimeUnit.MILLISECONDS
     private double turnMultiplier = 0;
     private final double turnMultiplierMax = 2;
     private double angleOfDeflectionTolerance = 2;
@@ -141,6 +146,16 @@ public class Test extends LinearOpMode {
         // Prompt user to press start button.
         telemetry.addData("IMU Example", "Press start to continue...");
         telemetry.update();
+
+        while (aprilTagWebcam.getVisionPortal().getCameraState() != VisionPortal.CameraState.STREAMING){
+            // do nothing
+            telemetry.addData("Camera State", "NOT READY");
+            telemetry.update();
+        }
+        exposureControl = aprilTagWebcam.getVisionPortal().getCameraControl(ExposureControl.class);
+        exposureControl.setMode(ExposureControl.Mode.Manual);
+        exposureControl.setExposure(defaultExposure, TimeUnit.MILLISECONDS);
+        telemetry.addData("Init Status", "FINISHED");
 
         // Wait for the game to start (driver presses START)
         waitForStart();
