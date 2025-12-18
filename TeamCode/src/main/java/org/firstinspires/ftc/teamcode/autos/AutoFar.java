@@ -21,6 +21,9 @@ public class AutoFar extends LinearOpMode{
 
         public double turnAimAngle = 10;
         public double backwardAmount = 20;
+
+        public double defaultRPM = 50;
+        public double defaultSpeed = 50;
     }
     public static Params params = new Params();
 
@@ -36,10 +39,22 @@ public class AutoFar extends LinearOpMode{
 
 //        // actions that need to happen on init; for instance, a claw tightening
 //        Actions.runBlocking(claw.closeClaw());
+        double targetRPM = params.defaultRPM;
+        double targetSpeed = params.defaultSpeed;
 
         while (!isStopRequested() && !opModeIsActive()) {
 //            int position = visionOutputPosition;
 //            telemetry.addData("Position during Init", position);
+            if (gamepad1.dpadUpWasPressed()) {
+                targetRPM += 5;
+                targetSpeed += 5;
+            } else if (gamepad1.dpadDownWasPressed()) {
+                targetRPM -= 5;
+                targetSpeed -= 5;
+            }
+
+            telemetry.addData("Target RPM", targetRPM);
+            telemetry.addData("Target Speed", targetSpeed);
             telemetry.addData("Initialization Status", "Initializing?");
             telemetry.update();
         }
@@ -67,7 +82,32 @@ public class AutoFar extends LinearOpMode{
                 new SequentialAction(
 //                        leaveWall,
                         attachments.spinUp(50),
-                        attachments.fireArtifact(5, 50, 50),//, speed change to 45?
+                        attachments.fireArtifact(5, targetRPM, targetSpeed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        ),//, speed change to 45?
                         moveForward
                         // add other actions / trajectories
                 )
