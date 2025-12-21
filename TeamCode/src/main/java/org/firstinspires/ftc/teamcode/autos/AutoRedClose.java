@@ -48,16 +48,15 @@ public class AutoRedClose extends LinearOpMode{
 //        // actions that need to happen on init; for instance, a claw tightening
 //        Actions.runBlocking(claw.closeClaw());
 
-        while (!isStopRequested() && !opModeIsActive()) {
-//            int position = visionOutputPosition;
-//            telemetry.addData("Position during Init", position);
-            telemetry.addData("Initialization Status", "Initializing?");
-            telemetry.update();
-        }
+//        while (!isStopRequested() && !opModeIsActive()) {
+////            int position = visionOutputPosition;
+////            telemetry.addData("Position during Init", position);
+//        }
 
 //        int startPosition = visionOutputPosition;
 //        telemetry.addData("Starting Position", startPosition);
 //        telemetry.update();
+
         telemetry.addData("Initialization Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -116,6 +115,7 @@ public class AutoRedClose extends LinearOpMode{
                         )
                 )
         );
+
     }
 }
 
@@ -667,4 +667,4 @@ public class AutoRedClose extends LinearOpMode{
 
 
 
-//Congrats! You found a fun easter egg left by Ian. Also look at the line number :p
+//Congrats! You found a fun easter egg left by Ian. Also look at the line number :p+

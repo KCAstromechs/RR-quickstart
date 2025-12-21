@@ -49,13 +49,14 @@ public class AutoBlueClose extends LinearOpMode{
 
 //        // actions that need to happen on init; for instance, a claw tightening
 //        Actions.runBlocking(claw.closeClaw());
+//        telemetry.addData("Initialization Status", "Initializing?");
+//        telemetry.update();
 
-        while (!isStopRequested() && !opModeIsActive()) {
-//            int position = visionOutputPosition;
-//            telemetry.addData("Position during Init", position);
-            telemetry.addData("Initialization Status", "Initializing?");
-            telemetry.update();
-        }
+//        while (!isStopRequested() && !opModeIsActive()) {
+////            int position = visionOutputPosition;
+////            telemetry.addData("Position during Init", position);
+//
+//        }
 
 //        int startPosition = visionOutputPosition;
 //        telemetry.addData("Starting Position", startPosition);
