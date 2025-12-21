@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleops;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.min;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -34,10 +35,10 @@ public class Test extends LinearOpMode {
 
     private AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     private ExposureControl exposureControl;
-    private long defaultExposure = 2; // in TimeUnit.MILLISECONDS
+    private long defaultExposure = 1; // in TimeUnit.MILLISECONDS
     private double turnMultiplier = 0;
     private final double turnMultiplierMax = 2;
-    private double angleOfDeflectionTolerance = 2;
+    private double angleOfDeflectionTolerance = 1;
 
     // IMU
     private IMU imu;
@@ -55,13 +56,15 @@ public class Test extends LinearOpMode {
     private DcMotorEx outtakeLeft = null;
     private DcMotorEx outtakeRight = null;
 
-    private double shooterPercent = .20; // 1.0 = 100%
-    private double minRPM = 30; // originally 95 RPM before 10/22/2025
+    private double defaultShooterPercent = 20; // 100 = 100%
+    private double defaultMinRPS = 30; // originally 95 RPM before 10/22/2025
+    private double shooterPercent = defaultShooterPercent;
+    private double minRPS = defaultMinRPS;
 
     private double leftTicksPerRev;
     private double rightTicksPerRev;
-    private double leftRPM;
-    private double rightRPM;
+    private double leftRPS;
+    private double rightRPS;
     private boolean shooting = false;
     private boolean canShoot = false;
 
@@ -156,6 +159,7 @@ public class Test extends LinearOpMode {
         exposureControl.setMode(ExposureControl.Mode.Manual);
         exposureControl.setExposure(defaultExposure, TimeUnit.MILLISECONDS);
         telemetry.addData("Init Status", "FINISHED");
+        telemetry.update();
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -186,10 +190,10 @@ public class Test extends LinearOpMode {
             }
 
             // progression logic
-            leftRPM = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
-            rightRPM = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
+            leftRPS = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
+            rightRPS = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
             shooting = gamepad2.right_trigger > 0.5;
-            canShoot = (leftRPM > minRPM && rightRPM > minRPM);
+            canShoot = (leftRPS > minRPS && rightRPS > minRPS);
             if (gamepad2.x || gamepad2.a || (shooting && canShoot)) { // if toggled, progression continue
                 progression.setPower(1 * progressionPercent);
             } else if (gamepad2.b) { // if b, progression retract from shooter
@@ -200,20 +204,20 @@ public class Test extends LinearOpMode {
 
             // shooter buttons
             if (gamepad2.dpadDownWasPressed()) {
-                shooterPercent -= .05; // -5%
+                shooterPercent -= .01; // -5%
             } else if (gamepad2.dpadUpWasPressed()) {
-                shooterPercent += .05; // +5%
+                shooterPercent += .01; // +5%
             }
             // minRPM buttons
             if (gamepad2.dpadRightWasPressed()) {
-                minRPM += 5;
+                minRPS += 1;
             } else if (gamepad2.dpadLeftWasPressed()) {
-                minRPM -= 5;
+                minRPS -= 1;
             }
 
             // outtake
-            outtakeLeft.setPower(gamepad2.right_trigger * shooterPercent);
-            outtakeRight.setPower(-gamepad2.right_trigger * shooterPercent);
+            outtakeLeft.setPower(gamepad2.right_trigger * (shooterPercent * .01));
+            outtakeRight.setPower(-gamepad2.right_trigger * (shooterPercent * .01));
 
             // Ian's shooter thing
              /*if (leftRPM > 95 && rightRPM > 95) {
@@ -267,6 +271,18 @@ public class Test extends LinearOpMode {
             AprilTagDetection idBlue = aprilTagWebcam.getTagBySpecificId(20);
             aprilTagWebcam.displayDetectionTelemtry(idRed);
             aprilTagWebcam.displayDetectionTelemtry(idBlue);
+
+            if (idRed == null && idBlue == null) {
+                shooterPercent = defaultShooterPercent;
+                minRPS = defaultMinRPS;
+            } else if (idRed != null){
+                // math
+                shooterPercent = 19.10442 - (-0.003401434/-0.01617827)*(1-Math.pow(Math.E, 0.01617827*(idRed.ftcPose.range)));
+                minRPS = shooterPercent + 10;
+            } else { // if blue
+                shooterPercent = 19.10442 - (-0.003401434/-0.01617827)*(1-Math.pow(Math.E, 0.01617827*(idBlue.ftcPose.range)));
+                minRPS = shooterPercent + 10;
+            }
 //        aprilTagWebcam.stop();
 
             // auto aim
@@ -341,10 +357,10 @@ public class Test extends LinearOpMode {
 //            telemetry.addData("Press B for progression toggle", progress);
             telemetry.addData("Set Power of intake", intake.getPower());
             telemetry.addData("Set Power of progression", progression.getPower());
-            telemetry.addData("Shooter Percentage", shooterPercent *100 + " %");
-            telemetry.addData("Minimum RPM", minRPM + " RPM");
-            telemetry.addData("RPM of shooterLeft", leftRPM); // (ticksPerSec/ticksPerRev) * 60
-            telemetry.addData("RPM of shooterRight", rightRPM ); // (ticksPerSec/ticksPerRev) * 60sd
+            telemetry.addData("Shooter Percentage", shooterPercent + " %");
+            telemetry.addData("Minimum RPS", minRPS + " RPS");
+            telemetry.addData("RPS of shooterLeft", leftRPS); // (ticksPerSec/ticksPerRev) * 60
+            telemetry.addData("RPS of shooterRight", rightRPS); // (ticksPerSec/ticksPerRev) * 60
             telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
