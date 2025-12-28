@@ -40,6 +40,8 @@ public class Test extends LinearOpMode {
     private final double turnMultiplierMax = 2;
     private double angleOfDeflectionTolerance = 1;
 
+    private double targetShootingAngle = 0;
+
     // IMU
     private IMU imu;
 
@@ -294,17 +296,22 @@ public class Test extends LinearOpMode {
          */
             if (gamepad1.a) {
                 if (idRed != null) {
+                    if (idRed.ftcPose.range < 200) {
+                        targetShootingAngle = 0;
+                    } else {
+                        targetShootingAngle = 6;
+                    }
                     //            double angleOfDeflection = idRed.xAngleToTag;
                     double angleOfDeflection = idRed.ftcPose.bearing;
                     telemetry.addData("Red Angle of Deflection", angleOfDeflection);
                     double turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
-                    if (angleOfDeflection > angleOfDeflectionTolerance) {
+                    if (angleOfDeflection > targetShootingAngle + angleOfDeflectionTolerance) {
                         //          turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(-Speed_percentage * turnMultiplier);
                         backLeft.setPower(Speed_percentage * turnMultiplier);
                         frontRight.setPower(-Speed_percentage * turnMultiplier);
                         frontLeft.setPower(Speed_percentage * turnMultiplier);
-                    } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                    } else if (angleOfDeflection < targetShootingAngle - angleOfDeflectionTolerance) {
                         //                  turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(Speed_percentage * turnMultiplier);
                         backLeft.setPower(-Speed_percentage * turnMultiplier);
@@ -316,19 +323,24 @@ public class Test extends LinearOpMode {
                         backLeft.setPower(0);
                         frontRight.setPower(0);
                         frontLeft.setPower(0);
-                    }
+                        }
                 } else if (idBlue != null) {
+                    if (idBlue.ftcPose.range < 200) {
+                        targetShootingAngle = 0;
+                    } else {
+                        targetShootingAngle = 6;
+                    }
                     //            double angleOfDeflection = idBlue.xAngleToTag;
                     double angleOfDeflection = idBlue.ftcPose.bearing;
                     telemetry.addData("Blue Angle of Deflection", angleOfDeflection);
                     turnMultiplier = Math.min(turnMultiplierMax, Math.max(Math.abs(angleOfDeflection) / 30, 0));
-                    if (angleOfDeflection > angleOfDeflectionTolerance) {
+                    if (angleOfDeflection > targetShootingAngle + angleOfDeflectionTolerance) {
                         //                turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(-Speed_percentage * turnMultiplier);
                         backLeft.setPower(Speed_percentage * turnMultiplier);
                         frontRight.setPower(-Speed_percentage * turnMultiplier);
                         frontLeft.setPower(Speed_percentage * turnMultiplier);
-                    } else if (angleOfDeflection < -angleOfDeflectionTolerance) {
+                    } else if (angleOfDeflection < targetShootingAngle - angleOfDeflectionTolerance) {
                         //                turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(Speed_percentage * turnMultiplier);
                         backLeft.setPower(-Speed_percentage * turnMultiplier);
