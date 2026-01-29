@@ -7,7 +7,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Attachments;
+import org.firstinspires.ftc.teamcode.AttachmentsRR;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
@@ -32,7 +32,7 @@ public class AutoFar extends LinearOpMode{
         Pose2d initialPose = new Pose2d(params.initialX, params.initialY, params.initialAngle);
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-        Attachments attachments = new Attachments(hardwareMap); // attachments actions object
+        AttachmentsRR attachmentsRR = new AttachmentsRR(hardwareMap); // attachmentsRR actions object
 
 //        // TODO (after adding the camera and figuring that out) put vision code here that outputs position
 //        int visionOutputPosition = 1;
@@ -81,8 +81,8 @@ public class AutoFar extends LinearOpMode{
         Actions.runBlocking(
                 new SequentialAction(
 //                        leaveWall,
-                        attachments.spinUp(50),
-                        attachments.fireArtifact(5, targetRPM, targetSpeed
+                        attachmentsRR.spinUp(50),
+                        attachmentsRR.fireArtifact(5, targetRPM, targetSpeed
 
 
 

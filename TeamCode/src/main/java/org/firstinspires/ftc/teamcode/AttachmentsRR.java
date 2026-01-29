@@ -7,19 +7,22 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public class Attachments {
+public class AttachmentsRR {
     // INSTANCE VARS
     // Params
     public static class Params {
-        private double defaultShooterSpeed = 0.3; // 1.0 = 100%
-        private double defaultMinRPM = 30;
+        public double defaultShooterSpeed = 0.3; // 1.0 = 100%
+        public double defaultMinRPM = 30;
+
+        public double stopperStopPos = 1.0;
+        public double stopperRaisedPos = 0.72;
     }
     public static Params params = new Params();
 
@@ -36,13 +39,16 @@ public class Attachments {
     private DcMotorEx progression;
     private DcMotorEx intake;
 
+    // The one Servo
+    private Servo stopper;
+
     // timer
     private ElapsedTime timer = new ElapsedTime();
 
     private ElapsedTime runTimer = new ElapsedTime();
 
     // THE ONLY CONSTRUCTOR
-    public Attachments(HardwareMap hardwareMap) {
+    public AttachmentsRR(HardwareMap hardwareMap) {
         // initialize shooters
         outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
         outtakeLeft.setDirection(DcMotorEx.Direction.FORWARD); // direction done
@@ -62,6 +68,10 @@ public class Attachments {
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotorEx.Direction.FORWARD);
+
+        // init servo
+        stopper = hardwareMap.get(Servo.class, "stopper");
+        stopper.setPosition(params.stopperStopPos);
     }
 
     public Action displayRunTime(Telemetry telemetry) {
@@ -111,7 +121,7 @@ public class Attachments {
         };
     }
 
-    /** Fires one artifact for s seconds
+    /** Fires one artifact for specified seconds
      *
      * @param durationSeconds (double) number of seconds you want to continuously shoot
      * @return returns false after shooter, progression, and intake run for durationSeconds seconds
@@ -123,9 +133,12 @@ public class Attachments {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    // continue outtaking
+                    // start outtaking
                     outtakeLeft.setPower(params.defaultShooterSpeed);
                     outtakeRight.setPower(params.defaultShooterSpeed);
+
+                    // flip stopper
+                    stopper.setPosition(params.stopperRaisedPos);
 
                     // reset/start timer
                     timer.reset();
@@ -155,6 +168,7 @@ public class Attachments {
                     outtakeLeft.setPower(0);
                     outtakeRight.setPower(0);
 
+                    stopper.setPosition(params.stopperStopPos);
                     return false; // action finished
                 }
 
@@ -163,7 +177,7 @@ public class Attachments {
         };
     }
 
-    /** Fires one artifact for s seconds
+    /** Fires one artifact for specified seconds
      *
      * @param durationSeconds (double) number of seconds you want to continuously shoot
      * @return returns false after shooter, progression, and intake run for durationSeconds seconds
@@ -175,9 +189,11 @@ public class Attachments {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    // continue outtaking
+                    // start outtaking
                     outtakeLeft.setPower(targetSpeed);
                     outtakeRight.setPower(targetSpeed);
+                    // flip stopper
+                    stopper.setPosition(params.stopperRaisedPos);
 
                     // reset/start timer
                     timer.reset();
@@ -207,6 +223,7 @@ public class Attachments {
                     outtakeLeft.setPower(0);
                     outtakeRight.setPower(0);
 
+                    stopper.setPosition(params.stopperStopPos);
                     return false; // action finished
                 }
 

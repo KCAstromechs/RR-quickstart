@@ -4,10 +4,12 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -24,7 +26,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import java.lang.Math;
 import java.util.concurrent.TimeUnit;
 
-
+@Config
 @TeleOp(name="Test", group="Testing")
 public class Test extends LinearOpMode {
 
@@ -62,8 +64,10 @@ public class Test extends LinearOpMode {
     private DcMotorEx outtakeLeft = null;
     private DcMotorEx outtakeRight = null;
 
-    private double defaultShooterPercent = 20; // 100 = 100%
-    private double defaultMinRPS = 30; // originally 95 RPM before 10/22/2025
+    private Servo stopper = null;
+
+    private double defaultShooterPercent = 21; // 100 = 100%
+    private double defaultMinRPS = 31; // originally 95 RPM?maybeRPS? before 10/22/2025
     private double shooterPercent = defaultShooterPercent;
     private double minRPS = defaultMinRPS;
 
@@ -73,6 +77,13 @@ public class Test extends LinearOpMode {
     private double rightRPS;
     private boolean shooting = false;
     private boolean canShoot = false;
+
+    public static class StopperPARAMS {
+        public double stopperStopPos = 1.0;
+        public double stopperRaisedPos = 0.72;
+    }
+
+    public static StopperPARAMS stopperPARAMS = new StopperPARAMS();
 
 //    private boolean in = false;
 //    private boolean progress = false;
@@ -142,6 +153,10 @@ public class Test extends LinearOpMode {
 
 //        outtakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        outtakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // The stopper
+        stopper = hardwareMap.get(Servo.class, "stopper");
+        stopper.setPosition(stopperPARAMS.stopperStopPos);
 
         Speed_percentage = 0.6;
         yawAngle = 0;
@@ -224,9 +239,14 @@ public class Test extends LinearOpMode {
             // outtake
             outtakeLeft.setPower(gamepad2.right_trigger * (shooterPercent * .01));
             outtakeRight.setPower(-gamepad2.right_trigger * (shooterPercent * .01));
+            if (Math.abs(gamepad2.right_trigger) > .3 || gamepad2.y) { // at least 30%
+                stopper.setPosition(stopperPARAMS.stopperRaisedPos);
+            } else {
+                stopper.setPosition(stopperPARAMS.stopperStopPos);
+            }
 
             // Ian's shooter thing
-             /*if (leftRPM > 95 && rightRPM > 95) {
+            /*if (leftRPM > 95 && rightRPM > 95) {
                 progression.setPower(1);
                 intake.setPower(1);
             }*/

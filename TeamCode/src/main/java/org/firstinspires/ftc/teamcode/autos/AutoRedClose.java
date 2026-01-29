@@ -6,13 +6,12 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Attachments;
+import org.firstinspires.ftc.teamcode.AttachmentsRR;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
@@ -40,7 +39,7 @@ public class AutoRedClose extends LinearOpMode{
         Pose2d initialPose = new Pose2d(params.initialX, params.initialY, params.initialAngle);
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-        Attachments attachments = new Attachments(hardwareMap); // attachments actions object
+        AttachmentsRR attachmentsRR = new AttachmentsRR(hardwareMap); // attachmentsRR actions object
 
 //        // TODO (after adding the camera and figuring that out) put vision code here that outputs position
 //        int visionOutputPosition = 1;
@@ -89,8 +88,8 @@ public class AutoRedClose extends LinearOpMode{
 //        Actions.runBlocking(
 //                new SequentialAction(
 //                    moveBackward,
-//                    attachments.spinUp(params.tgtRPM),
-//                    attachments.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
+//                    attachmentsRR.spinUp(params.tgtRPM),
+//                    attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
 //                    endPath
 //                        // add other actions / trajectories
 //                )
@@ -98,18 +97,18 @@ public class AutoRedClose extends LinearOpMode{
 
         Actions.runBlocking(
                 new ParallelAction(
-                        attachments.displayRunTime(telemetry),
+                        attachmentsRR.displayRunTime(telemetry),
                         new ParallelAction(
                                 fullPath,
                                 new SequentialAction( // the movement
                                         new SleepAction(3), // wait for first movement
-                                        attachments.spinUp(params.tgtRPM),
-                                        attachments.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
+                                        attachmentsRR.spinUp(params.tgtRPM),
+                                        attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
                                         new SleepAction(2), // wait for alignment to 1st set of balls
-                                        attachments.intake(1.7), // intake
+                                        attachmentsRR.intake(1.7), // intake
                                         new SleepAction(4), // wait for repositioning to shoot
-                                        attachments.spinUp(params.tgtRPM),
-                                        attachments.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed)
+                                        attachmentsRR.spinUp(params.tgtRPM),
+                                        attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed)
                                         // fin ... probably
                                 )
                         )

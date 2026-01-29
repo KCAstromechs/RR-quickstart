@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 @Config
 public class Launcher {
 
@@ -50,51 +52,49 @@ public class Launcher {
 
 //        outtakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        outtakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void decreaseShooterPercent() {
+        params.shooterPercent -= .01; // -1%
+    }
+    public void increaseShooterPercent() {
+        params.shooterPercent += .01; // +1%
+    }
+    public void increaseMinRPS() {
+        params.minRPS += 1;
+    }
+    public void decreaseMinRPS() {
+        params.minRPS -= 1;
+    }
+
+    /**
+     * shoots balls
+     * @param shooterMagnitude the magnitude of power (scaled down by shooterPercent) --> value between [0.0, 1.0]
+     */
+    public void shoot(double shooterMagnitude, AprilTagDetection tagDetection) {
 
         leftRPS = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
         rightRPS = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
         shooting = gamepad2.right_trigger > 0.5;
         canShoot = (leftRPS > params.minRPS && rightRPS > params.minRPS);
 
-        // shooter buttons
-        if (gamepad2.dpadDownWasPressed()) {
-            params.shooterPercent -= .01; // -5%
-        } else if (gamepad2.dpadUpWasPressed()) {
-            params.shooterPercent += .01; // +5%
-        }
-        // minRPM buttons
-        if (gamepad2.dpadRightWasPressed()) {
-            params.minRPS += 1;
-        } else if (gamepad2.dpadLeftWasPressed()) {
-            params.minRPS -= 1;
-        }
-
         // outtake
         outtakeLeft.setPower(gamepad2.right_trigger * (params.shooterPercent * .01));
         outtakeRight.setPower(-gamepad2.right_trigger * (params.shooterPercent * .01));
 
         // Distance-based shooting power
-        if (idRed == null && idBlue == null) {
+        if (tagDetection == null) {
             params.shooterPercent = params.defaultShooterPercent;
             params.minRPS = params.defaultMinRPS;
-        } else if (idRed != null){
+        } else {
             // math
-            if (idRed.ftcPose.range < 200) {
-                params.shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idRed.ftcPose.range))); //TODO: Replace with updated equation
-                params.minRPS = params.shooterPercent + 10; //TODO: Give minRPS its own equation
-            } else {
-                params.shooterPercent = 30;
-                params.minRPS = 40;
-            }
-        } else { // if blue
-            if (idBlue.ftcPose.range < 200) {
-                params.shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idBlue.ftcPose.range))); //TODO: Replace with updated equation
+            if (tagDetection.ftcPose.range < 200) {
+                params.shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (tagDetection.ftcPose.range))); //TODO: Replace with updated equation
                 params.minRPS = params.shooterPercent + 10; //TODO: Give minRPS its own equation
             } else {
                 params.shooterPercent = 30;
                 params.minRPS = 40;
             }
         }
-
     }
 }
