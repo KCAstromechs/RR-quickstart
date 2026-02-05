@@ -21,8 +21,8 @@ public class AttachmentsRR {
         public double defaultShooterSpeed = 0.3; // 1.0 = 100%
         public double defaultMinRPM = 30;
 
-        public double stopperStopPos = 1.0;
-        public double stopperRaisedPos = 0.72;
+        public double stopperStopPos = 0.7;
+        public double stopperRaisedPos = 0.3;
     }
     public static Params params = new Params();
 
@@ -112,6 +112,7 @@ public class AttachmentsRR {
                 leftRPM = 60 * (outtakeLeft.getVelocity() / leftTPR);
                 rightRPM = 60 * (outtakeRight.getVelocity() / rightTPR);
                 canShoot = (leftRPM > targetRPM && rightRPM > targetRPM);
+                stopper.setPosition(params.stopperRaisedPos);
 
                 packet.put("Left RPM", leftRPM);
                 packet.put("Right RPM", rightRPM);

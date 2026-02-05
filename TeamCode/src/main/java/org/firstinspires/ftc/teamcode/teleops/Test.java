@@ -42,7 +42,7 @@ public class Test extends LinearOpMode {
     private final double turnMultiplierMax = 2;
     private double closeAODTolerance = 1;
     private double farAODTolerance = 0.05;
-    private double AODTolerance = closeAODTolerance;
+    private double AODTolerance = closeAODTolerance; // degrees
 
     private double closeShootingAngle = 0;
     private double farShootingAngle = 5.3;
@@ -66,8 +66,8 @@ public class Test extends LinearOpMode {
 
     private Servo stopper = null;
 
-    private double defaultShooterPercent = 21; // 100 = 100%
-    private double defaultMinRPS = 31; // originally 95 RPM?maybeRPS? before 10/22/2025
+    private double defaultShooterPercent = 20; // 100 = 100%
+    private double defaultMinRPS = 30; // originally 95 RPM?maybeRPS? before 10/22/2025
     private double shooterPercent = defaultShooterPercent;
     private double minRPS = defaultMinRPS;
 
@@ -79,8 +79,8 @@ public class Test extends LinearOpMode {
     private boolean canShoot = false;
 
     public static class StopperPARAMS {
-        public double stopperStopPos = 1.0;
-        public double stopperRaisedPos = 0.72;
+        public double stopperStopPos = 0.7;
+        public double stopperRaisedPos = 0.3;
     }
 
     public static StopperPARAMS stopperPARAMS = new StopperPARAMS();
@@ -156,7 +156,7 @@ public class Test extends LinearOpMode {
 
         // The stopper
         stopper = hardwareMap.get(Servo.class, "stopper");
-        stopper.setPosition(stopperPARAMS.stopperStopPos);
+//        stopper.setPosition(stopperPARAMS.stopperStopPos);
 
         Speed_percentage = 0.6;
         yawAngle = 0;
@@ -304,7 +304,7 @@ public class Test extends LinearOpMode {
             } else if (idRed != null){
                 // math
                 if (idRed.ftcPose.range < 200) {
-                    shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idRed.ftcPose.range)));
+                    shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idRed.ftcPose.range))) -1;
                     minRPS = shooterPercent + 10;
                 } else {
                     shooterPercent = 30;
@@ -312,7 +312,7 @@ public class Test extends LinearOpMode {
                 }
             } else { // if blue
                 if (idBlue.ftcPose.range < 200) {
-                    shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idBlue.ftcPose.range)));
+                    shooterPercent = 19.10442 - (-0.003401434 / -0.01617827) * (1 - Math.pow(Math.E, 0.01617827 * (idBlue.ftcPose.range))) -1;
                     minRPS = shooterPercent + 10;
                 } else {
                     shooterPercent = 30;
@@ -330,18 +330,18 @@ public class Test extends LinearOpMode {
          */
             if (gamepad1.a) {
                 if (idRed != null) {
-                    if (idRed.ftcPose.range < 200) {
-                        targetShootingAngle = closeShootingAngle;
-                        AODTolerance = closeAODTolerance;
-                    } else {
-                        targetShootingAngle = farShootingAngle;
-                        AODTolerance = farAODTolerance;
-                    }
+//                    if (idRed.ftcPose.range < 200) {
+//                        targetShootingAngle = closeShootingAngle;
+//                        AODTolerance = closeAODTolerance;
+//                    } else {
+//                        targetShootingAngle = farShootingAngle;
+//                        AODTolerance = farAODTolerance;
+//                    }
                     //            double angleOfDeflection = idRed.xAngleToTag;
                     double angleOfDeflection = idRed.ftcPose.bearing;
                     telemetry.addData("Red Angle of Deflection", angleOfDeflection);
-                    double turnMultiplier = min(turnMultiplierMax, Math.max(abs(angleOfDeflection) / 30, 0));
-                    if (angleOfDeflection > targetShootingAngle + AODTolerance) {
+                    double turnMultiplier = min(turnMultiplierMax, Math.max(abs(angleOfDeflection) / 10, 0));
+                    if (angleOfDeflection > 0 + AODTolerance) {
                         //          turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(-Speed_percentage * turnMultiplier);
                         backLeft.setPower(Speed_percentage * turnMultiplier);
@@ -361,24 +361,24 @@ public class Test extends LinearOpMode {
                         frontLeft.setPower(0);
                         }
                 } else if (idBlue != null) {
-                    if (idBlue.ftcPose.range < 200) {
-                        targetShootingAngle = closeShootingAngle;
-                        AODTolerance = closeAODTolerance;
-                    } else {
-                        targetShootingAngle = -farShootingAngle;
-                        AODTolerance = farAODTolerance;
-                    }
+//                    if (idBlue.ftcPose.range < 200) {
+//                        targetShootingAngle = closeShootingAngle;
+//                        AODTolerance = closeAODTolerance;
+//                    } else {
+//                        targetShootingAngle = -farShootingAngle;
+//                        AODTolerance = farAODTolerance;
+//                    }
                     //            double angleOfDeflection = idBlue.xAngleToTag;
                     double angleOfDeflection = idBlue.ftcPose.bearing;
                     telemetry.addData("Blue Angle of Deflection", angleOfDeflection);
-                    turnMultiplier = min(turnMultiplierMax, Math.max(abs(angleOfDeflection) / 30, 0));
-                    if (angleOfDeflection > targetShootingAngle + AODTolerance) {
+                    turnMultiplier = min(turnMultiplierMax, Math.max(abs(angleOfDeflection) / 10, 0));
+                    if (angleOfDeflection > 0 + AODTolerance) {
                         //                turnMultiplier = JavaUtil.clamp(angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(-Speed_percentage * turnMultiplier);
                         backLeft.setPower(Speed_percentage * turnMultiplier);
                         frontRight.setPower(-Speed_percentage * turnMultiplier);
                         frontLeft.setPower(Speed_percentage * turnMultiplier);
-                    } else if (angleOfDeflection < targetShootingAngle - AODTolerance) {
+                    } else if (angleOfDeflection < 0 - AODTolerance) {
                         //                turnMultiplier = JavaUtil.clamp(-angleOfDeflection / 30, 0, turnMultiplierMax);
                         backRight.setPower(Speed_percentage * turnMultiplier);
                         backLeft.setPower(-Speed_percentage * turnMultiplier);

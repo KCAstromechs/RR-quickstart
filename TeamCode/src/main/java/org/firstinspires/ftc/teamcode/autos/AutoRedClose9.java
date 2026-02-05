@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.AttachmentsRR;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "AutoRedClose", group = "RedSide", preselectTeleOp = "Test")
-public class AutoRedClose extends LinearOpMode{
+@Autonomous(name = "AutoRedClose9", group = "RedSide", preselectTeleOp = "Test")
+public class AutoRedClose9 extends LinearOpMode{
 
     public static class Params {
         public double initialX = 0;
@@ -24,13 +24,14 @@ public class AutoRedClose extends LinearOpMode{
         public double initialAngle = Math.toRadians(0);
 
         public double backwardAmount = 50;
-        public double turnAngle = 140;
+        public double firstBallsAngle = 140;
+        public double returnParkAngle = 120;
 
-        public double returnAngleDeg = 30;
+        public double shootAngle = 30;
 //        public double returnAngle = Math.toRadians(returnAngleDeg); // not initial angle bc goofy
 
-        public double tgtRPM = 30;
-        public double tgtShootSpeed = .2; // 1.0 = 100%
+        public double tgtRPM = 25;
+        public double tgtShootSpeed = .18; // 1.0 = 100%
     }
     public static Params params = new Params();
 
@@ -72,15 +73,21 @@ public class AutoRedClose extends LinearOpMode{
 //                .build();
 
         Action fullPath = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(params.initialX + params.backwardAmount, params.initialY))
+                .strafeTo(new Vector2d(params.initialX + params.backwardAmount, params.initialY)) // back up
                 .waitSeconds(5) // shooting
-                .turnTo(Math.toRadians(params.turnAngle-3))
+                .turnTo(Math.toRadians(params.firstBallsAngle -3))
                 .strafeTo(new Vector2d(params.initialX+params.backwardAmount+10, params.initialY+10))// align with 1st layer of artifacts
                 .strafeTo(new Vector2d(params.initialX, params.initialY+45)) // also begin intaking
                 .strafeTo(new Vector2d(params.initialX+params.backwardAmount-20, params.initialY+10))// scoot back and prepare to get back to shooting pos
-                .turnTo(Math.toRadians(params.returnAngleDeg))
-                .waitSeconds(5) // wait to shoot
-                .turnTo(Math.toRadians(120))
+                .turnTo(Math.toRadians(params.shootAngle))
+                .waitSeconds(4.5) // wait to shoot
+                .turnTo(Math.toRadians(params.firstBallsAngle))
+                .strafeTo(new Vector2d(params.initialX+params.backwardAmount+13, params.initialY+43)) // line up with next layer of balls
+                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-47, params.initialY+78)) // also begin intaking
+                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-17, params.initialY+43)) // scoot to place to shoot
+                .turnTo(Math.toRadians(params.shootAngle))
+                .waitSeconds(4.5) // wait to shoot
+                .turnTo(Math.toRadians(params.returnParkAngle))
                 .strafeTo(new Vector2d(params.initialX-20, params.initialY+45))
                 // then move back off line
                 .build();
@@ -105,11 +112,16 @@ public class AutoRedClose extends LinearOpMode{
                                         attachmentsRR.spinUp(params.tgtRPM),
                                         attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
                                         new SleepAction(2), // wait for alignment to 1st set of balls
-                                        attachmentsRR.intake(1.7), // intake
+                                        attachmentsRR.intake(2), // intake
                                         new SleepAction(4), // wait for repositioning to shoot
                                         attachmentsRR.spinUp(params.tgtRPM),
+                                        attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
+                                        new SleepAction(3), // wait for alignment to 2nd set of balls
+                                        attachmentsRR.intake(2), // intake
+                                        new SleepAction(4), // wait for reposition to shoot
+                                        attachmentsRR.spinUp(params.tgtRPM),
                                         attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed)
-                                        // fin ... probably
+                                        //fin?
                                 )
                         )
                 )
@@ -117,553 +129,3 @@ public class AutoRedClose extends LinearOpMode{
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Congrats! You found a fun easter egg left by Ian. Also look at the line number :p+

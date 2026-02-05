@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.autos;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -17,8 +15,8 @@ import org.firstinspires.ftc.teamcode.AttachmentsRR;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "AutoBlueClose", group = "RedSide", preselectTeleOp = "Test")
-public class AutoBlueClose extends LinearOpMode{
+@Autonomous(name = "AutoRedClose6", group = "RedSide", preselectTeleOp = "Test")
+public class AutoRedClose6 extends LinearOpMode{
 
     public static class Params {
         public double initialX = 0;
@@ -26,13 +24,13 @@ public class AutoBlueClose extends LinearOpMode{
         public double initialAngle = Math.toRadians(0);
 
         public double backwardAmount = 50;
-        public double turnAngle = -140;
+        public double turnAngle = 140;
 
-        public double returnAngleDeg = -30;
+        public double returnAngleDeg = 30;
 //        public double returnAngle = Math.toRadians(returnAngleDeg); // not initial angle bc goofy
 
-        public double tgtRPM = 30;
-        public double tgtShootSpeed = .2; // 1.0 = 100%
+        public double tgtRPM = 25;
+        public double tgtShootSpeed = .18; // 1.0 = 100%
     }
     public static Params params = new Params();
 
@@ -48,18 +46,16 @@ public class AutoBlueClose extends LinearOpMode{
 
 //        // actions that need to happen on init; for instance, a claw tightening
 //        Actions.runBlocking(claw.closeClaw());
-//        telemetry.addData("Initialization Status", "Initializing?");
-//        telemetry.update();
 
 //        while (!isStopRequested() && !opModeIsActive()) {
 ////            int position = visionOutputPosition;
 ////            telemetry.addData("Position during Init", position);
-//
 //        }
 
 //        int startPosition = visionOutputPosition;
 //        telemetry.addData("Starting Position", startPosition);
 //        telemetry.update();
+
         telemetry.addData("Initialization Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -76,16 +72,21 @@ public class AutoBlueClose extends LinearOpMode{
 //                .build();
 
         Action fullPath = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(params.initialX + params.backwardAmount, -(params.initialY)))
+                .strafeTo(new Vector2d(params.initialX + params.backwardAmount, params.initialY))
                 .waitSeconds(5) // shooting
-                .turnTo(Math.toRadians(params.turnAngle))
-                .strafeTo(new Vector2d(params.initialX+params.backwardAmount+10, -(params.initialY+10)))// align with 1st layer of artifacts
-                .strafeTo(new Vector2d(params.initialX, -(params.initialY+45))) // also begin intaking
-                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-20, -(params.initialY+10)))// scoot back and prepare to get back to shooting pos
+                .turnTo(Math.toRadians(params.turnAngle-3))
+                .strafeTo(new Vector2d(params.initialX+params.backwardAmount+10, params.initialY+10))// align with 1st layer of artifacts
+                .strafeTo(new Vector2d(params.initialX, params.initialY+45)) // also begin intaking
+                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-20, params.initialY+10))// scoot back and prepare to get back to shooting pos
                 .turnTo(Math.toRadians(params.returnAngleDeg))
                 .waitSeconds(5) // wait to shoot
-                .turnTo(Math.toRadians(-120))
-                .strafeTo(new Vector2d(params.initialX-20, -(params.initialY+45)))
+//                .turnTo(Math.toRadians(params.turnAngle))
+//                .strafeTo(new Vector2d(params.initialX+params.backwardAmount, params.initialY+30)) // line up with next layer of balls
+//                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-60, params.initialY+65)) // also begin intaking
+//                .strafeTo(new Vector2d(params.initialX+params.backwardAmount-30, params.initialY+30))
+//                .waitSeconds(4.5) // wait to shoot
+                .turnTo(Math.toRadians(120))
+                .strafeTo(new Vector2d(params.initialX-20, params.initialY+45))
                 // then move back off line
                 .build();
 
@@ -109,21 +110,14 @@ public class AutoBlueClose extends LinearOpMode{
                                         attachmentsRR.spinUp(params.tgtRPM),
                                         attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed),
                                         new SleepAction(2), // wait for alignment to 1st set of balls
-                                        attachmentsRR.intake(1.7), // intake
+                                        attachmentsRR.intake(2), // intake
                                         new SleepAction(4), // wait for repositioning to shoot
                                         attachmentsRR.spinUp(params.tgtRPM),
                                         attachmentsRR.fireArtifact(5, params.tgtRPM, params.tgtShootSpeed)
-                                        // fin ... probably
+                                        //fin?
                                 )
                         )
                 )
         );
-    }
-
-    @NonNull
-    public static Action turnLeft(double degrees, MecanumDrive drive) {
-        return drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                .turnTo(Math.toRadians(degrees))
-                .build();
     }
 }
