@@ -213,10 +213,15 @@ public class Test extends LinearOpMode {
             // progression logic
             leftRPS = (outtakeLeft.getVelocity() / leftTicksPerRev) * 60;
             rightRPS = (outtakeRight.getVelocity() / rightTicksPerRev) * 60 * -1;
-            shooting = gamepad2.right_trigger > 0.5;
+            if (gamepad2.left_trigger > 0.5) {
+                shooting = gamepad2.left_trigger > 0.5;
+                minRPS = defaultMinRPS;
+            } else {
+                shooting = gamepad2.right_trigger > 0.5;
+            }
             canShoot = (leftRPS > minRPS && rightRPS > minRPS);
             if (gamepad2.x || gamepad2.a || (shooting && canShoot)) { // if toggled, progression continue
-                progression.setPower(1 * progressionPercent);
+                progression.setPower(1 * progressionPercent);                                                                                                                                                                                                                                                     
             } else if (gamepad2.b) { // if b, progression retract from shooter
                 progression.setPower(-1 * progressionPercent);
             } else {
@@ -225,21 +230,26 @@ public class Test extends LinearOpMode {
 
             // shooter buttons
             if (gamepad2.dpadDownWasPressed()) {
-                shooterPercent -= .01; // -5%
+                defaultShooterPercent -= 1; // -1%
             } else if (gamepad2.dpadUpWasPressed()) {
-                shooterPercent += .01; // +5%
+                defaultShooterPercent += 1; // +1%
             }
             // minRPM buttons
             if (gamepad2.dpadRightWasPressed()) {
-                minRPS += 1;
+                defaultMinRPS += 1;
             } else if (gamepad2.dpadLeftWasPressed()) {
-                minRPS -= 1;
+                defaultMinRPS -= 1;
             }
 
             // outtake
-            outtakeLeft.setPower(gamepad2.right_trigger * (shooterPercent * .01));
-            outtakeRight.setPower(-gamepad2.right_trigger * (shooterPercent * .01));
-            if (Math.abs(gamepad2.right_trigger) > .3 || gamepad2.y) { // at least 30%
+            if (gamepad2.left_trigger > 0.2) {
+                outtakeLeft.setPower(gamepad2.left_trigger * defaultShooterPercent * 0.01);
+                outtakeRight.setPower(-gamepad2.left_trigger * defaultShooterPercent * 0.01);
+            } else {
+                outtakeLeft.setPower(gamepad2.right_trigger * (shooterPercent * .01));
+                outtakeRight.setPower(-gamepad2.right_trigger * (shooterPercent * .01));
+            }
+            if (Math.abs(gamepad2.right_trigger) > .3 || gamepad2.y || Math.abs(gamepad2.left_trigger) > .3) { // at least 30%
                 stopper.setPosition(stopperPARAMS.stopperRaisedPos);
             } else {
                 stopper.setPosition(stopperPARAMS.stopperStopPos);
@@ -408,7 +418,9 @@ public class Test extends LinearOpMode {
             telemetry.addData("Set Power of intake", intake.getPower());
             telemetry.addData("Set Power of progression", progression.getPower());
             telemetry.addData("Shooter Percentage", shooterPercent + " %");
+            telemetry.addData("Default Shooter Percentage", defaultShooterPercent + "%");
             telemetry.addData("Minimum RPS", minRPS + " RPS");
+            telemetry.addData("Default Minimum RPS", defaultMinRPS + " RPS");
             telemetry.addData("RPS of shooterLeft", leftRPS); // (ticksPerSec/ticksPerRev) * 60
             telemetry.addData("RPS of shooterRight", rightRPS); // (ticksPerSec/ticksPerRev) * 60
             telemetry.addData("Encoder pos of leftFront", frontLeft.getCurrentPosition());
