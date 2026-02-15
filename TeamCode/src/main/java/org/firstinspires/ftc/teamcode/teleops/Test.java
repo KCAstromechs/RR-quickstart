@@ -301,7 +301,7 @@ public class Test extends LinearOpMode {
             frontLeft.setPower((leftFrontPower));
             // Get the orientation and angular velocity.
 
-            // update the vison portal
+            // update the vision portal
             aprilTagWebcam.update();
             AprilTagDetection idRed = aprilTagWebcam.getTagBySpecificId(24);
             AprilTagDetection idBlue = aprilTagWebcam.getTagBySpecificId(20);

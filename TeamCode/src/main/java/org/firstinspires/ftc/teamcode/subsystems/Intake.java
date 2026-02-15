@@ -9,17 +9,17 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Intake {
 
-    public static class Speeds {
+    public static class Params {
         public double IN = 1.0;
         public double OUT = -1.0; // currently half
         public double OFF = 0.0;
     }
 
-    public static Speeds speeds = new Speeds();
+    public static Params params = new Params();
 
     private DcMotor intake;
 
-    private enum IntakeState {
+    public enum IntakeState {
         INTAKING,
         OUTTAKING,
         OFF
@@ -39,26 +39,30 @@ public class Intake {
         intakeState = IntakeState.OFF;
     }
 
-    public void updateIntake() {
+    public void updateIntake(LauncherPID.LauncherState launcherState) {
         // could add state machine logic here if needed
-        switch (intakeState) {
-            case INTAKING:
+        if (launcherState != LauncherPID.LauncherState.LAUNCHING) {
+            switch (intakeState) {
+                case INTAKING:
 
-                intake.setPower(speeds.IN);
-                break;
+                    intake.setPower(params.IN);
+                    break;
 
-            case OUTTAKING:
+                case OUTTAKING:
 
-                intake.setPower(speeds.OUT);
-                break;
+                    intake.setPower(params.OUT);
+                    break;
 
-            case OFF:
+                case OFF:
 
-                intake.setPower(speeds.OFF);
-                break;
+                    intake.setPower(params.OFF);
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
+        } else {
+            intake.setPower(params.IN);
         }
     }
 
