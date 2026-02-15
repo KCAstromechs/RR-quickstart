@@ -2,13 +2,16 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Config
 public class FieldCentricDrive {
@@ -40,6 +43,23 @@ public class FieldCentricDrive {
     }
 
     private BoostState boostState;
+
+    public enum AutoAimState {
+        ON,
+        OFF
+    }
+    private AutoAimState autoAimState;
+
+    // auto aim vars
+    double kP = 0.0020;
+    double error = 0;
+    double lastError = 0;
+    double tgtAngle = 0; // offset here
+    double angleTolerance = 0.5;
+
+    double kD = 0.0001;
+    double curTime = 0;
+    double lastTime = 0;
 
     public void init(HardwareMap hardwareMap) {
         imu = hardwareMap.get(IMU.class, "imu");
@@ -87,7 +107,7 @@ public class FieldCentricDrive {
      *  - Updates yaw / rotation
      *  - updates boost state
      */
-    public void updateDrive() {
+    public void updateDrive(AprilTagDetection aprilTagDetection, OpMode opMode, double moveX, double moveY, double rotX) {
         // update yaw
         updateYaw();
 
@@ -100,7 +120,37 @@ public class FieldCentricDrive {
                 speedPercentage = speeds.normalSpeed;
                 break;
         }
-        // TODO add auto aim
+
+        // auto aim logic
+        switch (autoAimState) {
+            case ON:
+                if (aprilTagDetection != null) {
+                    error = tgtAngle - aprilTagDetection.ftcPose.bearing; // tx (error = where you want to be MINUS where you are)
+
+                    if (Math.abs(error) < angleTolerance) {
+                        rotX = 0;
+                    } else {
+                        double pTerm = error * kP;
+                        curTime = opMode.getRuntime();
+                        double dT = curTime - lastTime; // change in time
+                        double dTerm = ((error - lastError) / dT) * kD;
+
+                        rotX = Range.clip(pTerm + dTerm, -0.4, 0.4);
+
+                        lastError = error;
+                        lastTime = curTime;
+                    }
+                } else {
+                    lastError = 0;
+                    lastTime = opMode.getRuntime();
+                }
+            case OFF:
+                lastError = 0;
+                lastTime = opMode.getRuntime();
+        }
+
+        // drive motors
+        drive(moveX, moveY, rotX);
     }
 
     public void boost() {
@@ -109,6 +159,14 @@ public class FieldCentricDrive {
 
     public void normal() {
         if (boostState == BoostState.BOOSTING) boostState = BoostState.NORMAL;
+    }
+
+    public void enableAutoAim() {
+        autoAimState = AutoAimState.ON;
+    }
+
+    public void disableAutoAim() {
+        autoAimState = AutoAimState.OFF;
     }
 
     public void drive(double moveX, double moveY, double rotX) {

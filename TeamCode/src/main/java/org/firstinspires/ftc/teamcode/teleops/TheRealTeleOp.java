@@ -92,7 +92,17 @@ public class TheRealTeleOp extends OpMode {
         }
 
         // Drive Keybinds
-        drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // movement
+//        drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // movement
+        double moveX = gamepad1.left_stick_x;
+        double moveY = gamepad1.left_stick_y;
+        double rotX = gamepad1.right_stick_x;
+        // auto aim
+        if (gamepad1.a) {
+            drive.enableAutoAim();
+        } else {
+            drive.disableAutoAim();
+        }
+
         // boost
         if (gamepad1.right_bumper || gamepad1.left_bumper) {
             drive.boost();
@@ -105,15 +115,22 @@ public class TheRealTeleOp extends OpMode {
         }
 
         // update subsystems while passing in appropriate args
-        drive.updateDrive(); // also pass in aprilTags for future autoaim?
-
+        // Non-Camera dependent
         intake.updateIntake(launcher.getLauncherState());
 
         progression.updateProgression(launcher.getLauncherState());
 
+        // Camera dependent
         if (idRed != null) {
             launcher.updateLauncher(idRed);
-        } else launcher.updateLauncher(idBlue);
+            drive.updateDrive(idRed, this, moveX, moveY, rotX);
+        } else if (idBlue != null) {
+            launcher.updateLauncher(idBlue);
+            drive.updateDrive(idBlue, this, moveX, moveY, rotX);
+        } else {
+            launcher.updateLauncher(null);
+            drive.updateDrive(null, this, moveX, moveY, rotX);
+        }
 
         // show main telemetry
         intake.displayTelemetry(telemetry);
