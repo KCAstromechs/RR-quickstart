@@ -39,6 +39,7 @@ public class TheRealTeleOp extends OpMode {
         progression.init(hardwareMap);
 
         // init camera
+        aprilTagWebcam.init(hardwareMap, telemetry);
         while (aprilTagWebcam.getVisionPortal().getCameraState() != VisionPortal.CameraState.STREAMING){
             // update telemetry while waiting
             telemetry.addData("Camera State", "NOT READY");
@@ -64,7 +65,7 @@ public class TheRealTeleOp extends OpMode {
 
         // Attachment Keybinds
         // Intake Keybinds
-        if (Math.abs(gamepad1.right_trigger) > .25 || Math.abs(gamepad1.left_trigger) > .25) {
+        if (Math.abs(gamepad1.right_trigger) > .25 || Math.abs(gamepad1.left_trigger) > .25 || gamepad2.x) {
             intake.intake();
         } else if (gamepad1.dpad_down) {
             intake.outtake();
@@ -80,7 +81,15 @@ public class TheRealTeleOp extends OpMode {
         }
 
         // Progression Keybinds
-        // TODO
+        if (gamepad2.y) {
+            progression.manualStopperRaise();
+        } else if (gamepad2.x) {
+            progression.manualFWD();
+        } else if (gamepad2.b) {
+            progression.manualBWD();
+        } else {
+            progression.resetToAuto();
+        }
 
         // Drive Keybinds
         drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // movement
@@ -90,9 +99,13 @@ public class TheRealTeleOp extends OpMode {
         } else {
             drive.normal();
         }
+        // reset Yaw
+        if (gamepad1.y) {
+            drive.resetYaw();
+        }
 
         // update subsystems while passing in appropriate args
-        drive.updateDrive();
+        drive.updateDrive(); // also pass in aprilTags for future autoaim?
 
         intake.updateIntake(launcher.getLauncherState());
 
@@ -100,11 +113,7 @@ public class TheRealTeleOp extends OpMode {
 
         if (idRed != null) {
             launcher.updateLauncher(idRed);
-        } else if (idBlue != null) {
-            launcher.updateLauncher(idBlue);
-        } else {
-            launcher.updateLauncher();
-        }
+        } else launcher.updateLauncher(idBlue);
 
         // show main telemetry
         intake.displayTelemetry(telemetry);

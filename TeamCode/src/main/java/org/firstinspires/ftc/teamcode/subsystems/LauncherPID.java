@@ -36,6 +36,7 @@ public class LauncherPID {
     public enum LauncherState {
         SPIN_UP,
         LAUNCHING,
+        RESPIN_UP,
         OFF
     }
     private LauncherState launcherState;
@@ -62,37 +63,18 @@ public class LauncherPID {
 
     // No need for inc/dec defaultVel (FOR NOW)
 
-    public void updateLauncher() {
-        // update other vars
-        curLeftVel = outtakeLeft.getVelocity();
-        curRightVel = outtakeRight.getVelocity();
-        switch (launcherState) {
-            case SPIN_UP:
-                outtakeLeft.setVelocity(params.targetVel);
-                outtakeRight.setVelocity(params.targetVel);
-                // if curVel is within toleranceVel, switch to launching
-                if (velWithinTolerance()) {
-                    launcherState = LauncherState.LAUNCHING;
-                }
-                break;
-            case LAUNCHING:
-                outtakeLeft.setVelocity(params.targetVel);
-                outtakeRight.setVelocity(params.targetVel);
-                // if curVel is no long within toleranceVel, switch back to spin_up
-                if (!velWithinTolerance()) {
-                    launcherState = LauncherState.SPIN_UP;
-                }
-                break;
-            case OFF:
-                outtakeLeft.setVelocity(0);
-                outtakeRight.setVelocity(0);
-                break;
-        }
-    }
-
+    /**
+     * Update Launcher with distance calculations aprilTagDetection isn't null
+     * @param aprilTagDetection AprilTagDetection obj representing the aprilTag to get dist from
+     */
     public void updateLauncher(AprilTagDetection aprilTagDetection) {
         // update other vars
-        distFromGoal = aprilTagDetection.ftcPose.range;
+        if (aprilTagDetection != null) {
+            distFromGoal = aprilTagDetection.ftcPose.range;
+            params.targetVel = calculateTargetVel(distFromGoal);
+        } else {
+            params.targetVel = params.defaultVel;
+        }
         curLeftVel = outtakeLeft.getVelocity();
         curRightVel = outtakeRight.getVelocity();
         switch (launcherState) {
@@ -109,12 +91,22 @@ public class LauncherPID {
                 outtakeRight.setVelocity(params.targetVel);
                 // if curVel is no long within toleranceVel, switch back to spin_up
                 if (!velWithinTolerance()) {
-                    launcherState = LauncherState.SPIN_UP;
+                    launcherState = LauncherState.RESPIN_UP;
+                }
+                break;
+            case RESPIN_UP:
+                outtakeLeft.setVelocity(params.targetVel);
+                outtakeRight.setVelocity(params.targetVel);
+                // if curVel is within toleranceVel, switch to launching
+                if (velWithinTolerance()) {
+                    launcherState = LauncherState.LAUNCHING;
                 }
                 break;
             case OFF:
                 outtakeLeft.setVelocity(0);
                 outtakeRight.setVelocity(0);
+                break;
+            default:
                 break;
         }
     }
@@ -142,8 +134,11 @@ public class LauncherPID {
         telemetry.addData("Last AprilTag Range (dist from goal)", distFromGoal);
     }
 
-    private void calculateTargetVel(double bearing) {
-
+    private double calculateTargetVel(double range) {
+        // TODO
+        double targetVel = 0;
+        // do stuff
+        return targetVel;
     }
 
     private boolean velWithinTolerance() {

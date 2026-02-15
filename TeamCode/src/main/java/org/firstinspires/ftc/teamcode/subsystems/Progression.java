@@ -67,7 +67,28 @@ public class Progression {
         }
     }
 
-    // TODO manual methods to be implemented
+    /**
+     * Manually moves stopper to raised position
+     * NOTE: turns of auto capabilities
+     */
+    public void manualStopperRaise() {
+        progressionState = ProgressionState.MANUAL;
+        stopper.setPosition(params.stopperRaisedPos);
+    }
+
+    public void manualFWD() {
+        progressionState = ProgressionState.MANUAL;
+        progression.setPower(params.FWD);
+    }
+
+    public void manualBWD() {
+        progressionState = ProgressionState.MANUAL;
+        progression.setPower(params.BWD);
+    }
+
+    public void resetToAuto() {
+        progressionState = ProgressionState.AUTO;
+    }
 
     public ProgressionState getProgressionState() {
         return progressionState;
@@ -75,6 +96,7 @@ public class Progression {
 
     public void displayTelemetry(Telemetry telemetry) {
         telemetry.addLine("Progression telemetry:");
-
+        telemetry.addData("Progression State", getProgressionState());
+        telemetry.addData("StopperPosition", stopper.getPosition());
     }
 }

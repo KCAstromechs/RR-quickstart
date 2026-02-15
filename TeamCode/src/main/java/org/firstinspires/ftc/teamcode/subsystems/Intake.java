@@ -11,6 +11,7 @@ public class Intake {
 
     public static class Params {
         public double IN = 1.0;
+        public double RE_IN = 0.5;
         public double OUT = -1.0; // currently half
         public double OFF = 0.0;
     }
@@ -40,29 +41,38 @@ public class Intake {
     }
 
     public void updateIntake(LauncherPID.LauncherState launcherState) {
-        // could add state machine logic here if needed
-        if (launcherState != LauncherPID.LauncherState.LAUNCHING) {
-            switch (intakeState) {
-                case INTAKING:
+        switch (launcherState) {
+            case OFF:
+                switch (intakeState) {
+                    case INTAKING:
 
-                    intake.setPower(params.IN);
-                    break;
+                        intake.setPower(params.IN);
+                        break;
 
-                case OUTTAKING:
+                    case OUTTAKING:
 
-                    intake.setPower(params.OUT);
-                    break;
+                        intake.setPower(params.OUT);
+                        break;
 
-                case OFF:
+                    case OFF:
 
-                    intake.setPower(params.OFF);
-                    break;
+                        intake.setPower(params.OFF);
+                        break;
 
-                default:
-                    break;
-            }
-        } else {
-            intake.setPower(params.IN);
+                    default:
+                        break;
+                }
+                break;
+            case SPIN_UP:
+                intake.setPower(params.OFF);
+                break;
+            case LAUNCHING:
+                intake.setPower(params.IN);
+                break;
+            case RESPIN_UP:
+                intake.setPower(params.RE_IN);
+            default:
+                break;
         }
     }
 
@@ -76,12 +86,12 @@ public class Intake {
         if (intakeState != IntakeState.OFF) intakeState = IntakeState.OFF;
     }
 
-    public String getState() {
-        return intakeState.toString();
+    public IntakeState getIntakeState() {
+        return intakeState;
     }
 
     public void displayTelemetry(Telemetry telemetry) {
         telemetry.addLine("Intake Telemetry:");
-        telemetry.addData("Intake State", getState());
+        telemetry.addData("Intake State", getIntakeState());
     }
 }
